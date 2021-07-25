@@ -23,13 +23,10 @@
 #define UMBRAL_SUP 1300 //El rango en cuentas de las AI es de 0 a 4096, si VDD=3.3V -> 1300 => 1.04V
 #define UMBRAL_INF 1000 //El rango en cuentas de las AI es de 0 a 4096, si VDD=3.3V -> 1000 => 0.8V
 
-#define ADC_RES_bits 12 //Resolución del ADC del mDot
-
+#define ADC_RES_bits 12
 // Se obtiene las cuentas corriendo binariamente la cantidad de bits de resolucion del ADC
 #define ADC_RES_Cuentas ((1<<ADC_RES_bits)-1)
 
-
-// Por defecto se coloca en banda australiana 915Mhz
 #if !defined(CHANNEL_PLAN)
 #define CHANNEL_PLAN CP_AU915
 #endif
@@ -40,13 +37,13 @@
 
 ///*********DEFINICION DE VARIABLES Y PARAMETROS********////////
 
-#define CLOCK 96    //frec del micro en MHZ
+#define CLOCK 32    //frec del micro en MHZ
 
-int cantidad_AI=8;
+int cantidad_AI=4;
 
 //Creo un arreglo para guardar las frecuencias de los canales leidos
-float frec_ch[8];
-int frec_ch_int[8];
+float frec_ch[4]={0,0,0,0};
+int frec_ch_int[4];
 
 int flag_configuracion=0;
 //int TIEMPOS[5];
@@ -68,35 +65,28 @@ int CONFIGURACION[15];
 //[13] modo_AI[6];
 //[14] modo_AI[7];
 
-//float *K = new float[cantidad_AI]; // Toma las constantes de cada caudalímetro.
-float K[8]; // Toma las constantes de cada caudalímetro.
+float K[4];
+
 
 int TIEMPO_SLEEP;
 int unidad_TIEMPO_SLEEP;
 int cantidad_REINTENTOS;
-//int TIEMPO_REINTENTOS_CONSECUTIVOS;
+int TIEMPO_REINTENTOS_CONSECUTIVOS;
 int TIEMPO_RANDOM_SUP;
 int TIEMPO_RANDOM_INF;
 
 mDot::mdot_file nombre_file;
 
+//int seleccion_CP;
 int seleccion_frec;
 
-//Se crea vector de estados de Analog Inputs
-//int *modo_AI = new int[cantidad_AI]; // 0: Deshabilitada 1: Habilitada
-int modo_AI[8];// 0: Deshabilitada 1: Habilitada
+int modo_AI[4]; // 0: Deshabilitada 1: Habilitada
 
-uint32_t Tiempo_reintento_join=60; // en seg no sé qué es
-uint32_t Tiempo_reintento_join_2=60; // en seg no sé qué es
+uint32_t Tiempo_reintento_join=60; // en seg
+uint32_t Tiempo_reintento_join_2=60; // en seg
 
 
-/////////////////////////////////////////////////////////////
-// * these options must match the settings on your gateway //
-// * edit their values to match your configuration         //
-// * frequency sub band is only relevant for the 915 bands //
-// * either the network name and passphrase can be used or //
-//     the network ID (8 bytes) and KEY (16 bytes)         //
-/////////////////////////////////////////////////////////////
+
 //////////////////////////////////////////////////////////////////////////
 // * estas opciones deben coincidir con la configuración de su gateway  //
 // * edite sus valores para que coincidan con su configuración          //
@@ -115,7 +105,7 @@ static uint8_t ack = 1; //0 if acks are disabled, otherwise retries (1 - 8)
 static bool adr = true;
 
 
-
+// deepsleep consume ligeramente menos corriente que sleep
 // en sleep mode, el estado IO es mantenido, la RAM es retenida , y la aplicación se reanudará después de despertarse
 // en deepsleep mode, IOs flotantes, RAM se pierde, y la aplicación comenzará desde el principio después de despertarse
 // si deep_sleep == true, el dispositivo ingresará en deepsleep mode
@@ -125,8 +115,6 @@ static bool deep_sleep = false;
 mDot* dot = NULL;
 lora::ChannelPlan* plan = NULL;
 
-//Se crea objeto para puerto serial
-
 Serial pc(USBTX, USBRX);
 
 // AI a utilizar
@@ -134,31 +122,22 @@ AnalogIn AI_1(PB_1);  // Pin 20
 AnalogIn AI_2(PB_0);  // Pin 19
 AnalogIn AI_3(PA_5);  // Pin 18
 AnalogIn AI_4(PA_4);  // Pin 17
-AnalogIn AI_5(PA_1);  // Pin 16
-AnalogIn AI_6(PC_1);  // Pin 15
-AnalogIn AI_7(PA_0);  // Pin 12
-AnalogIn AI_8(PA_7);  // Pin 11
-//AnalogIn AI_9(PA_6);  // Pin 4
-//AnalogIn AI_10(PA_3);  // Pin 3
-//AnalogIn AI_11(PA_2);  // Pin 2
 
 // DI a utilizar
-DigitalIn DI_Config(PC_9, PullDown); // Pin 4
-DigitalIn DI_Panel(PA_8, PullDown); // Pin 6
+DigitalIn DI_modo(PA_6, PullDown); // Pin 4
 
 // DO a utilizar
-DigitalOut Led(PC_13); // Pin 13. Este será un diodo amarillo que indica que está en modo config
-DigitalOut Led_Ok(PA_11); // Pin 13. Este será un diodo rojo que indicará fallas
+DigitalOut Led(PC_13); // Pin 13
 
 Timer timer1;
 Timer timer2;
 
 /////*************Declaro las funciones a utilizar**********************////
-void error_1(class mbed::DigitalOut led);
+void parpadeo_1(class mbed::DigitalOut led);
 
 void parpadeo_2(class mbed::DigitalOut led);
 
-void entrada_modo_config(class mbed::DigitalOut led);
+void parpadeo_3(class mbed::DigitalOut led);
 
 float funcion_calcularFrec (int);
 
@@ -169,15 +148,14 @@ bool func_leer_config(void);
 
 //******************DEFINICION DE FUNCIONES*******************////
 
-void error_1(class mbed::DigitalOut led)
+void parpadeo_1(class mbed::DigitalOut led)
 {
-    // Led Rojo parpadeando indica error en escritura
-    while (1) {
-        led.write(1);
-        wait(1);
-        led.write(0);
-        wait(1);
-    }   
+    //parpadeo 1: encendido durante 2 seg
+    // indica error en escritura
+    led.write(1);
+    wait(2);
+    led.write(0);
+       
 }
 
 void parpadeo_2(class mbed::DigitalOut led)
@@ -194,19 +172,24 @@ void parpadeo_2(class mbed::DigitalOut led)
     }
 }
 
-void entrada_modo_config(class mbed::DigitalOut led)
+void parpadeo_3(class mbed::DigitalOut led)
 {
-    // indica que se ingreso en el modo configuracion. Se prende 5 segundos y se apaga.
+    //parpadeo 3: parpadea dos veces, duracion 1 seg cada destello
+    // indica que se ingreso en el modo configuracion
     led.write(1);
-    wait(5);
+    wait(1);
     led.write(0);
-   
+    wait(1);
+    led.write(1);
+    wait(1);
+    led.write(0);
+       
 }
 
-float funcion_calcularFrec (int ADC_leer) //Lee 8 adc distintos. Se le indica cuál es el de interés
+float funcion_calcularFrec (int ADC_leer) //lee 8 adc distintos
 {
-
-    uint16_t muestras; //Cantidad de muestras tomadas por el adc con la función read
+    
+    uint16_t muestras;
     int tiempo_total=0, tiempo_inicio=0; 
     float frecHZ;
     int contador = 0;
@@ -236,9 +219,10 @@ float funcion_calcularFrec (int ADC_leer) //Lee 8 adc distintos. Se le indica cu
                         muestras=(uint16_t) (ADC_RES_Cuentas*AI_4.read());
                         break;
                 
+                
             }
 
-            // Si la señal supera el umbral se activa el flag y cuenta el ascenso.
+            // Si la señal supera el umbral viniendo de un valor menor a este.
             // Es decir cuando por primera vez en el ciclo al umbral superior es superado.
             if ((muestras > UMBRAL_SUP) && (flag == 0))
             {
@@ -246,7 +230,7 @@ float funcion_calcularFrec (int ADC_leer) //Lee 8 adc distintos. Se le indica cu
                 flag = 1;
                 if(contador==1)
                 {
-                    //tiempo desde que inicio desde que paso el umbral sup por primera vez
+                    //tiempo desde que inicio hasta que se paso el umbral sup por primera vez
                     // se debe restar este tiempo para el calculo de frec
                     tiempo_inicio=timer2.read_us();
                 }
@@ -258,24 +242,50 @@ float funcion_calcularFrec (int ADC_leer) //Lee 8 adc distintos. Se le indica cu
                 flag = 0;
             }
             
-            // Vuelvo a leer el tiempo en us y me fijo si pasó 1 segundo y todavía no llegó ni a la mitad de ciclos que
-            // tendría la mas baja frecuencia entonces corto porque o no hay señal o es una frecuencia no permitida
-            // y salgo del while
+            // En caso de que no haya señal, para que salga del while
+            /*if((timer2.read_us() > 1000000) && (contador < 21))
+            {              
+                return 0;
+            } */
 
             if((timer2.read_us() > 1000000) && (contador < 21))
-            {   
-                timer2.stop();           
+            {
+                ///////////////esto funciona
+                tiempo_total=timer2.read_us();
+                timer2.stop();
+                pc.printf("total_time [us]=%d \n\r\n",tiempo_total); 
+                ventana=float(tiempo_total);
+                pc.printf("ventana [ms]=%f \n\r\n",ventana);
+                pc.printf("contador =%d \n\r\n",contador);
                 return 0;
-            } 
+
+            }
+
+            /* if((timer2.read_us() > 1000000) && (contador < 21))
+            {
+                ///////////////esto funciona
+                tiempo_total=timer2.read_us();
+                timer2.stop();
+                pc.printf("total_time [us]=%d \n\r\n",tiempo_total); 
+                ventana=float(tiempo_total);
+                pc.printf("ventana [ms]=%f \n\r\n",ventana);
+                contador=20;
+                pc.printf("contador =%d \n\r\n",contador);
+                frecHZ = 1000000*float(contador)/ventana;
+                pc.printf("frec=%f\n\r\n",frecHZ); 
+                return 0;
+
+            }*/
+            
     }
         
         
-    // Tiempo final de la toma de muestras y conteo de 40 flancos
+    // Tiempo total de la toma de muestras
     tiempo_total=timer2.read_us();
     pc.printf("total_time [us]=%d \n\r\n",tiempo_total);
     timer2.stop();
     
-    // Tiempo efectivo de los 40 ciclos desde que detecta el primero hasta el último.
+    // Tiempo efectivo de los 40 ciclos
     ventana= float(tiempo_total-tiempo_inicio);   
     pc.printf("ventana [us]=%f \n\r\n",ventana);
       
@@ -283,7 +293,7 @@ float funcion_calcularFrec (int ADC_leer) //Lee 8 adc distintos. Se le indica cu
     if(contador!=0)
         contador = contador-1;
 
-    //Paso a Hz debido a que la ventana de tiempo está en us.
+    //la Ventana de tiempo esta en uS, para pasarla a Hz la multiplico por 1000000
     frecHZ = 1000000*float(contador)/ventana;
     pc.printf("frec=%f\n\r\n",frecHZ);
     
@@ -294,232 +304,257 @@ float funcion_calcularFrec (int ADC_leer) //Lee 8 adc distintos. Se le indica cu
 void func_configuracion()
 {
         
-        int indice_conf = 0; //Para ver qué quiere configurar.
-        int tiempoSleep = 0; // Lo inicializo con un valor por si se entra al modo config y no se setea esto.
-        //int aux = 0; // Esta variable se utilizará para guardar en archivo
-        int flag_error_write=0; // Flag de error de lectura
-        int cantReintentos = 0; //Variable que contiene cantidad de reintentos.
-        int tiempoSuperior;
-        int tiempoInferior;
-        int configFrecuencia;
-        int aux = 0; //Variable a utilizar en la toma de dato de habilitación de AI
-        float aux2 = 0; // Variable a utilizar para los coeficientes K
+        int indicador_conf=0;
+        int flag_error_write=0;
         int valor_aux=0;
         int valor_aux_2=0;
         char ok[3]="\0";
 
          
-        // Existe un struct que tiene una variable fd con tipo de dato int16. Si ese valor es negativo implica que
-        // hay error en la carga de archivo.
+
         if(nombre_file.fd<0)
         {
             printf("ERROR en el archivo");
         }
 
-        entrada_modo_config(Led); //Acá debería parpadear el led que te indica que estás en el modo configuración.
+        parpadeo_3(Led);
 
-        // Se queda esperando que el usuario ponga "ok" en el inicio.
-        pc.printf("Usted se encuentra en el modo configuración. Ingrese 'ok' para continuar.\n");
+        // espero que llegue el "ok" de inicio
         pc.scanf("%s",ok);
-
         if(strcmp(ok, "ok")==0)
         {
-                pc.printf("%d_", cantidad_AI);     //Calculo que esto es solo para printear cuantas entradas AI hay. Se podría omitir o agregar mas info         
+                //wait(1);
+                pc.printf("%d_", cantidad_AI);               
         }
 
         
 
         while(1)
         {
-            
+            char indicador_conf_cad[3]="\0";
             char cadena2[8]="\0";
             char cadena3[3]="\0";
             char cadena4[2]="\0";
 
-            int modo_AI_conf[cantidad_AI];
-            float K_conf[cantidad_AI];
+            int modo_AI_aux[cantidad_AI];
+            float K_aux[cantidad_AI];
 
-            // Se queda esperando en consola a que llegue el indicador
-            pc.printf("Indique el número correspondiente de las siguientes opciones para configurar:\n ");
-            pc.printf("1 - Tiempo en el que permanecerá en Modo Sleep."); //ünica opción será en sleep.
-            pc.printf("2 - Cantidad de reintentos en caso de falla de envío de dato."); //Serán 2 por defecto
-            pc.printf("3 - Límites de intervalo de tiempo de reintentos."); // Esto se hará de manera aleatoria.
-            pc.printf("4 - Banda de Frecuencia de Operación");
-            pc.printf("5 - Configuración de Entradas Analógicas");
-            pc.scanf("%d", &indice_conf);
-            
+            // espero que llegue el indicador
+            pc.scanf("%s",indicador_conf_cad);
+            indicador_conf= std::atoi(indicador_conf_cad);// indica el parametro a modificar
 
-            switch(indice_conf)
+
+            switch(indicador_conf)
             {
                 case 1:
                         // TIEMPO_SLEEP
-                        pc.printf("Ingrese el tiempo de sleep en segundos: \n");
-                        pc.scanf("%d", &tiempoSleep);
-                        //pc.scanf("%d",cadena2);
-                        //pc.scanf("%s",cadena3);                   
-                        //pc.scanf("%s",cadena4);
+                        pc.scanf("%s",cadena2);
+                        pc.scanf("%s",cadena3);                   
+                        pc.scanf("%s",cadena4);
                         // msj 1 : digito1 y digito2
                         // msj 2 : digito3 
                         // msj 3 : unidad
 
-                        //if(strcmp(cadena3, "_")!=0) //tres digitos
-                        //    strcat(cadena2, cadena3); // dato de tiempo completo                         
+                        if(strcmp(cadena3, "_")!=0)//tres digitos
+                            strcat(cadena2, cadena3);// dato de tiempo completo                         
 
 
                         // paso el tiempo a segundos
-                        //valor_aux = std::atoi(cadena2);
+                        valor_aux= std::atoi(cadena2);
 
-                        //valor_aux_2 = valor_aux * int(std::pow(double(60),(std::atoi(cadena4)))); 
+                        valor_aux_2=valor_aux * int(std::pow(double(60),(std::atoi(cadena4)))); 
                         
                         
                         // Escribe valor temporal
                         dot->seekUserFile(nombre_file, 0, 0);
-                        flag_error_write = dot->writeUserFile(nombre_file, &tiempoSleep, sizeof(tiempoSleep)); // Devuelve -1 si hay error. //Se guarda en memoria flash (no volátil)
+                        flag_error_write =dot->writeUserFile(nombre_file, &valor_aux_2, sizeof(valor_aux_2));
 
                         // Escribe unidad de tiempo [hora min seg]
-                        //valor_aux=std::atoi(cadena4) ; 
-                        //dot->seekUserFile(nombre_file, sizeof(int), 0);
-                        if(flag_error_write < 0) // Si falla la escritura
-                            error_1(Led_Ok);  //Enciende Led Rojo intermitente 
+                        valor_aux=std::atoi(cadena4) ; 
+                        dot->seekUserFile(nombre_file, sizeof(int), 0);
+                        if( dot->writeUserFile(nombre_file, &valor_aux, sizeof(valor_aux))<0 || flag_error_write<0) //si falla alguna de las escrituras
+                            parpadeo_1(Led);  
                         break;
 
                 case 2:
                         // TIEMPO_REINTENTOS_CONSECUTIVOS
-                        //char cadena_aux[2];
-                        //pc.scanf("%s",cadena_aux);
+                        char cadena_aux[2];
+                        pc.scanf("%s",cadena_aux);
                         // msj 1 : num_reintentos
-                        //valor_aux= std::atoi(cadena_aux);// cantidad de reintentos
-                        pc.printf("Ingrese la cantidad de reintentos en caso de que falle la comunicación: \n");
-                        pc.scanf("%d", &cantReintentos);
+                        valor_aux= std::atoi(cadena_aux);// cantidad de reintentos
 
-                        if(cantReintentos!=0)
+                        if(valor_aux!=0)
                         {
-                            //pc.scanf("%s",cadena2);
-                            //pc.scanf("%s",cadena3);
+                            pc.scanf("%s",cadena2);
+                            pc.scanf("%s",cadena3);
                             
                             // msj 2 : digito1 y digito2
                             // msj 3 : digito3
                        
-                            //if(strcmp(cadena3, "_")!=0)
-                            //    strcat(cadena2, cadena3);
+                            if(strcmp(cadena3, "_")!=0)
+                                strcat(cadena2, cadena3);
                             
-                            //valor_aux_2= std::atoi(cadena2);// tiempo en segundos
+                            valor_aux_2= std::atoi(cadena2);// tiempo en segundos
 
                         }else
                         {
-                            //valor_aux_2=0; // si los reintentos son 0, el tiempo de reintento tambien es 0
+                            valor_aux_2=0; // si los reintentos son 0, el tiempo de reintento tambien es 0
                         }
 
-                        //dot->seekUserFile(nombre_file, sizeof(int)*2, 0);
-                        dot->seekUserFile(nombre_file, sizeof(int), 0);
-                        flag_error_write = dot->writeUserFile(nombre_file, &cantReintentos, sizeof(cantReintentos)); //Se guarda en memoria flash (no volátil)
+                        dot->seekUserFile(nombre_file, sizeof(int)*2, 0);
+                        flag_error_write = dot->writeUserFile(nombre_file, &valor_aux, sizeof(valor_aux));
 
-                        //dot->seekUserFile(nombre_file, sizeof(int)*3, 0);
-                        if(flag_error_write<0) //Si falla la escritura
-                            error_1(Led_Ok); //Enciende Led Rojo intermitente
+                        dot->seekUserFile(nombre_file, sizeof(int)*3, 0);
+                        if( dot->writeUserFile(nombre_file, &valor_aux_2, sizeof(valor_aux_2))<0 || flag_error_write<0)//se guarda en la memoria no volatil
+                            parpadeo_1(Led);
                         break;
                 
                 case 3:
-                        // TIEMPO_RANDOM_SUP
-                        pc.printf("Ingrese el límite de tiempo superior: \n");
-                        pc.scanf("%d", &tiempoSuperior);
-                        // pc.scanf("%s",cadena2);
-                        // pc.scanf("%s",cadena3);
+                        //TIEMPO_RANDOM_SUP
+                        pc.scanf("%s",cadena2);
+                        pc.scanf("%s",cadena3);
                         // msj 1 : digito1 y digito2
                         // msj 2 : digito3
 
-                        //if(strcmp(cadena3, "_")!=0)
-                        //    strcat(cadena2, cadena3);
+                        if(strcmp(cadena3, "_")!=0)
+                            strcat(cadena2, cadena3);
 
-                        //valor_aux= std::atoi(cadena2);// tiempo en segundos
-                        dot->seekUserFile(nombre_file, sizeof(int)*2, 0);
-                        flag_error_write = dot->writeUserFile(nombre_file, &tiempoSuperior, sizeof(tiempoSuperior));
-                        if( flag_error_write < 0)
-                            error_1(Led_Ok);
+                        valor_aux= std::atoi(cadena2);// tiempo en segundos
+                        dot->seekUserFile(nombre_file, sizeof(int)*4, 0);
+
+                        if( dot->writeUserFile(nombre_file, &valor_aux, sizeof(valor_aux))<0)//se guarda en la memoria no volatil
+                            parpadeo_1(Led);
                         break;
 
                 case 4:
                         //TIEMPO_RANDOM_INF
-                        pc.printf("Ingrese el límite de tiempo inferior: \n");
-                        pc.scanf("%d", &tiempoInferior);
-                        //pc.scanf("%s",cadena2);
-                        //pc.scanf("%s",cadena3);
+                        pc.scanf("%s",cadena2);
+                        pc.scanf("%s",cadena3);
                         // msj 1 : digito1 y digito2
                         // msj 2 : digito3
 
-                        //if(strcmp(cadena3, "_")!=0)
-                        //    strcat(cadena2, cadena3);
+                        if(strcmp(cadena3, "_")!=0)
+                            strcat(cadena2, cadena3);
 
-                        //valor_aux= std::atoi(cadena2);// tiempo en segundos
-                        dot->seekUserFile(nombre_file, sizeof(int)*3, 0);
-                        flag_error_write = dot->writeUserFile(nombre_file, &tiempoInferior, sizeof(tiempoInferior));
-                        if(flag_error_write < 0)
-                            error_1(Led_Ok);
+                        valor_aux= std::atoi(cadena2);// tiempo en segundos
+                        dot->seekUserFile(nombre_file,  sizeof(int)*5, 0);
+
+                        if( dot->writeUserFile(nombre_file, &valor_aux, sizeof(valor_aux))<0)//se guarda en la memoria no volatil
+                            parpadeo_1(Led);
                         break;
 
                 case 5:
-                        // Configuracion frec
-                        //pc.scanf("%s",cadena2);
-                        //valor_aux= std::atoi(cadena2);
-                        pc.printf("1 - AU915 \n");
-                        pc.printf("2 - US915 \n");
-                        pc.scanf("%d", &configFrecuencia);
-
-                        dot->seekUserFile(nombre_file, sizeof(int)*4, 0);
-                        flag_error_write = dot->writeUserFile(nombre_file, &configFrecuencia, sizeof(configFrecuencia));
-
-                        if(flag_error_write < 0) //se guarda en la memoria no volatil
-                            error_1(Led_Ok);
+                        // configuracion frec
+                        pc.scanf("%s",cadena2);
+                        valor_aux= std::atoi(cadena2);
+                        dot->seekUserFile(nombre_file, sizeof(int)*6, 0);
+                        if(valor_aux>=65 && valor_aux<=71)
+                        {
+                            if( (dot->writeUserFile(nombre_file, &valor_aux, sizeof(valor_aux))<0))//se guarda en la memoria no volatil
+                                parpadeo_1(Led);     
+                        }    
                         break;
-                
+
                 case 6:
-                        // Configuracion AI
+                        //Envio de configuracion tiempos
+                        dot->seekUserFile(nombre_file, 0, 0);
+                        dot->readUserFile(nombre_file, &CONFIGURACION, sizeof(int)*6);
+                        pc.printf("%d_%d_%d_%d_%d_%d", CONFIGURACION[0]/int(std::pow(double(60),CONFIGURACION[1])), CONFIGURACION[1], CONFIGURACION[2], CONFIGURACION[3], CONFIGURACION[4], CONFIGURACION[5]);
+                        break;     
+
+                case 7:
+                        //Envio de configuracion banda de frec
+                        dot->seekUserFile(nombre_file, sizeof(int)*6, 0);
+                        dot->readUserFile(nombre_file, &seleccion_frec, sizeof(seleccion_frec));
+                        switch(seleccion_frec)
+                        {
+                            // A
+                            case 65:        pc.printf("US915");                          
+                                            break;
+                                    
+                            // B
+                            case 66:        pc.printf("AU915");
+                                            break;
+                                    
+                            // C
+                            case 67:        pc.printf("EU868");
+                                            break;
+                                    
+                            // D
+                            case 68:        pc.printf("KR920");
+                                            break;
+                                    
+                            // E
+                            case 69:        pc.printf("AS923");
+                                            break;
+                                    
+                            // F
+                            case 70:        pc.printf("AS923_JAPAN");
+                                            break;
+                            // G
+                            case 71:        pc.printf("IN865");
+                                            break;
+                        }
+                        break;  
+                
+                case 8:
+                        // configuracion AI
                         int i;
                         int j;
-                        pc.printf("Ingrese 1 para habilitar, 0 para deshabilitar\n");
                         
-                        // Configuración de AI --> habilitada o deshabilitada
+
+                        // recibo conf de AI --> habilitada o deshabilitada
                         for(i=0;i<cantidad_AI;i++)
                         {
-                            pc.printf("Habilitar entrada de caudal %d", i+1);
-                            pc.scanf("%d",&aux);
-                            //pc.scanf("%s",cadena2);
-                            //modo_AI_aux[i] = std::atoi(cadena2);
-                            modo_AI_conf[i] = aux;
+                            pc.scanf("%s",cadena2);
+                            modo_AI_aux[i] = std::atoi(cadena2);
                         }
 
-                        // Pido los coeficientes K 
-                        for(i=0;i<cantidad_AI;i++)
+                        // recibo los coeficientes K
+                        for(j=0;j<cantidad_AI;j++)
                         {
-                            pc.printf("Ingrese coeficiente K para la entrada %d", i+1);
-                            pc.scanf("%f",&aux2);
-                            K_conf[i] = aux2;
+                            pc.scanf("%s",cadena2);
+                            pc.scanf("%s",cadena3);
+                            if(strcmp(cadena3, "_")!=0)
+                                strcat(cadena2, cadena3);
+                           
+                            K_aux[j] = std::stof(cadena2);
                         }
 
 
-                        dot->seekUserFile(nombre_file,  sizeof(int)*5, 0);
-                        flag_error_write=dot->writeUserFile(nombre_file, &modo_AI_conf, sizeof(modo_AI_conf));
-                        dot->seekUserFile(nombre_file,  sizeof(int)*13, 0); // Me paro luego de guardar los modos AI
-                        
-                        if( dot->writeUserFile(nombre_file, &K_conf, sizeof(K_conf))<0 || flag_error_write<0) //se guarda en la memoria no volatil
-                            error_1(Led_Ok);
+                        dot->seekUserFile(nombre_file,  sizeof(int)*7, 0);
+                        flag_error_write=dot->writeUserFile(nombre_file, &modo_AI_aux, sizeof(modo_AI_aux));
+                        dot->seekUserFile(nombre_file,  sizeof(int)*11, 0);
+                        if( dot->writeUserFile(nombre_file, &K_aux, sizeof(K_aux))<0 || flag_error_write<0) //se guarda en la memoria no volatil
+                            parpadeo_1(Led);
+                        break;
+                            
+                case 9:
+                        //Envio de configuracion AI
+                        dot->seekUserFile(nombre_file, sizeof(int)*7, 0);
+                        dot->readUserFile(nombre_file, &modo_AI, sizeof(modo_AI));
+                        dot->seekUserFile(nombre_file, sizeof(int)*11, 0);
+                        dot->readUserFile(nombre_file, &K, sizeof(K));
+                        pc.printf("%d%d%d%d", modo_AI[0], modo_AI[1], modo_AI[2], modo_AI[3]);
+                        wait(0.05);
+                        pc.printf("%.1f_%.1f_%.1f_%.1f", K[0], K[1], K[2], K[3]);
                         break;
 
-                //case 7:
+                case 10:
                         //Envio de configuracion AppKey y DevKey
-                //        int k;
-                //        for(k=0;k<16; k++)
-                //        {
-                //            pc.printf("%X", network_key[k]);
-                //        }
-                //        pc.printf("_");
+                        int k;
+                        for(k=0;k<16; k++)
+                        {
+                            pc.printf("%X", network_key[k]);
+                        }
+                        pc.printf("_");
 
-                //        for(k=0;k<8; k++)
-                //        {
-                //            pc.printf("%X", network_id[k]);
-                //        }
+                        for(k=0;k<8; k++)
+                        {
+                            pc.printf("%X", network_id[k]);
+                        }
                                  
-                //        break;
+                        break;
             }
         }
 
@@ -546,7 +581,7 @@ bool func_leer_config(void)
         TIEMPO_SLEEP=CONFIGURACION[0];
         unidad_TIEMPO_SLEEP=CONFIGURACION[1];
         cantidad_REINTENTOS=CONFIGURACION[2];
-        //TIEMPO_REINTENTOS_CONSECUTIVOS=CONFIGURACION[3];
+        TIEMPO_REINTENTOS_CONSECUTIVOS=CONFIGURACION[3];
         TIEMPO_RANDOM_SUP=CONFIGURACION[4];
         TIEMPO_RANDOM_INF=CONFIGURACION[5];
         seleccion_frec=CONFIGURACION[6];
@@ -560,7 +595,7 @@ bool func_leer_config(void)
         logInfo("TIEMPO_SLEEP = %d\n\r", TIEMPO_SLEEP);
         logInfo("unidad_TIEMPO_SLEEP = %d\n\r", unidad_TIEMPO_SLEEP);
         logInfo("cantidad_REINTENTOS = %d\n\r", cantidad_REINTENTOS);
-        //logInfo("TIEMPO_REINTENTOS_CONSECUTIVOS = %d\n\r",  TIEMPO_REINTENTOS_CONSECUTIVOS);
+        logInfo("TIEMPO_REINTENTOS_CONSECUTIVOS = %d\n\r",  TIEMPO_REINTENTOS_CONSECUTIVOS);
         logInfo("TIEMPO_RANDOM_SUP = %d\n\r",  TIEMPO_RANDOM_SUP);
         logInfo("TIEMPO_RANDOM_INF = %d\n\r",  TIEMPO_RANDOM_INF);
 
@@ -575,7 +610,7 @@ bool func_leer_config(void)
 
         }else
         {
-            if(TIEMPO_SLEEP<= (TIEMPO_RANDOM_SUP +  (cantidad_REINTENTOS + 1)))
+            if(TIEMPO_SLEEP<= (TIEMPO_RANDOM_SUP +  (cantidad_REINTENTOS + 1)*TIEMPO_REINTENTOS_CONSECUTIVOS))
             {
                 logInfo("ERROR en la configuracion");
                 error_config= true;
@@ -610,7 +645,7 @@ bool func_leer_config(void)
                             plan = new lora::ChannelPlan_AU915();
                             logInfo("\n\rSe selecciono AU915\n\r");
                             break;
-            /*        
+                    
             // C
             case 67:
                             //CHANNEL_PLAN CP_EU868;
@@ -644,7 +679,7 @@ bool func_leer_config(void)
                             plan = new lora::ChannelPlan_IN865();
                             logInfo("\n\rSe selecciono IN865\n\r");
                             break;
-            */                
+                            
             default: 
                             logInfo("\n\rEl valor ingresado no es valido\n\r");
                             logInfo("\n\rseleccion_frec= %d\n\r", seleccion_frec);
@@ -699,7 +734,7 @@ bool func_leer_config(void)
     }
         
     
-    if(DI_Config)   
+    if(DI_modo)   
     {
         // Configuracion
         func_configuracion();     
@@ -918,8 +953,8 @@ bool func_leer_config(void)
 
                     if((cantidad_envios - flag_error_envio - num_intentos) != 0) // si en la siguiente comparacion salgo del while no hago el wait
                     {
-                        //logInfo("wait %d\n\r",TIEMPO_REINTENTOS_CONSECUTIVOS);
-                        //wait(TIEMPO_REINTENTOS_CONSECUTIVOS);
+                        logInfo("wait %d\n\r",TIEMPO_REINTENTOS_CONSECUTIVOS);
+                        wait(TIEMPO_REINTENTOS_CONSECUTIVOS);
                     }   
         
                 }                
@@ -957,7 +992,7 @@ bool func_leer_config(void)
                         //logInfo("tiempo_rand = %d\n\r\n", tiempo_rand);
                         logInfo("tiempo_rand  = %d\n\r\n",tiempo_rand);
                         // T suma
-                        tiempo_suma=tiempo_rand + (num_intentos-1);
+                        tiempo_suma=tiempo_rand + ((num_intentos-1) * TIEMPO_REINTENTOS_CONSECUTIVOS);
                         logInfo("tiempo_suma  = %d\n\r\n",tiempo_suma);
 
 
@@ -974,7 +1009,7 @@ bool func_leer_config(void)
                             num_intentos=num_intentos-1;// resto para que de bien el t sleep 
                         }
                         // Sleep por Tsleep - T suma -T reintento * num reintentos      
-                        sleep_wake_rtc_only(deep_sleep,TIEMPO_SLEEP - tiempo_suma -(num_intentos));
+                        sleep_wake_rtc_only(deep_sleep,TIEMPO_SLEEP - tiempo_suma -(num_intentos * TIEMPO_REINTENTOS_CONSECUTIVOS));
 
                         // T suma=0
                         tiempo_suma=0;
