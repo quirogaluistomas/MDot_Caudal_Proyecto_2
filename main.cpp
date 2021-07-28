@@ -806,7 +806,7 @@ bool func_leer_config(void)
         
         int j=0;
         int k=0;
-        int flag_error_envio=0;
+        //int flag_error_envio=0; //Preguntar luego qué onda esta variable
         int num_intentos=0;
         int cantidad_envios= 1 + cantidad_REINTENTOS;
         int caudal[cantidad_AI];
@@ -855,8 +855,8 @@ bool func_leer_config(void)
 
                 }
         
-                if(flag_error_envio==0)// Si no hay error de envío, realizo la medicion pues armo paquete nuevo
-                {
+                //if(flag_error_envio==0)// Si no hay error de envío, realizo la medicion pues armo paquete nuevo
+                //{
                     tx_data1.clear(); //Limpio el paquete 1 de datos para armar nuevo
                     tx_data2.clear(); //Limpio el paquete 2 de datos para armar nuevo
 
@@ -957,26 +957,38 @@ bool func_leer_config(void)
                     //timer1.stop();
                     //int tiempo= timer1.read_us();
                     //pc.printf("tiempo [us]=%d \n\r\n",tiempo);              
-                }
+                //}
                 
                 //Hasta acá armé los paquetes nada mas, no los envié.
 
                 num_intentos=0; // cuenta la cantidad de intentos de comunicación que se intentaron desde que falló
-                
+                SumaTiempoRandom = 0; //Suma el tiempo random total para luego restarlo a cuando debe ir a sleep
                 
                 //Transmision del primer msj      
                              
                 //while(((cantidad_envios - flag_error_envio - num_intentos) != 0) && (send_data(tx_data1)!=0)  ) //si no recibio el ACK en ninguna de las dos ventanas y si no se realizaron todos los intentos
-                while(((cantidad_envios - flag_error_envio - num_intentos) != 0) && ( (send_data(tx_data1)!=0) || (send_data(tx_data2)!=0) ) ) //Si no recibio el ACK en alguna de las dos ventanas (distinto de cero) y si no se realizaron todos los intentos
+                while(((cantidad_envios - num_intentos) != 0) && ( (send_data(tx_data1)!=0) || (send_data(tx_data2)!=0) ) ) //Si no recibio el ACK en alguna de las dos ventanas (distinto de cero) y si no se realizaron todos los intentos
                 {
                     num_intentos++; //Va por el próximo intento pues falló alguna condición, por ej, no se recibió ACK de algun send_data   
                     logInfo("Intento numero: %d\n\r",num_intentos);    
 
-                    //if((cantidad_envios - flag_error_envio - num_intentos) != 0) // si en la siguiente comparacion salgo del while no hago el wait
-                    //{
-                        //logInfo("wait %d\n\r",TIEMPO_REINTENTOS_CONSECUTIVOS);
-                        //wait(TIEMPO_REINTENTOS_CONSECUTIVOS);
-                    //}   
+                    //El if de ahora es por si no quiero reintentos que la condición de 0 por la resta y chau, que no intente enviar nuevamente, luego saldrá del while
+                    if((cantidad_envios - num_intentos) != 0) // si en la siguiente comparacion salgo del while no hago el wait
+                    {
+                         
+                        srand (time(NULL));
+                        
+                        // Obtengo el valor random que se debe esperar para enviar
+                        TiempoRandom = rand() % (TIEMPO_RANDOM_SUP - TIEMPO_RANDOM_INF) + TIEMPO_RANDOM_INF;
+                        //logInfo("tiempo_rand = %d\n\r\n", tiempo_rand);
+                        logInfo("Tiempo random asignado  = %d\n\r\n",TiempoRandom);
+                        // Tiempo random total que se consume. 
+                        SumaTiempoRandom = SumaTiempoRandom + TiempoRandom;
+                        logInfo("Tiempo random total  = %d\n\r\n",SumaTiempoRandom);
+                        
+                        logInfo("wait %d\n\r",TiempoRandom);
+                        wait(TiempoRandom);
+                    }   
         
                 }                
         
@@ -984,17 +996,17 @@ bool func_leer_config(void)
 
                 // Si entra en modo deepsleep, guarde la sesión para que no se necesite unirse nuevamente después de despertar
                 // no es necesario si entra en modo sleep ya que se retiene la RAM, sirve para XDot
-                if (sleepMode) {
+                //if (sleepMode) {
                     //logInfo("Guardar sesion de red en NVM");
-                    dot->saveNetworkSession();
-                }
+                //    dot->saveNetworkSession();
+                //}
                 
                 
-                /// El tiempo de sleep depende de las condiciones
+                // El tiempo de sleep depende de las condiciones
                 // esto se hace para intentar mantener constante el tiempo entre muestras, 
                 // si ocurre una falla la muestra actual sufrira un desfasaje 
                 // pero la proxima muestra no se encuentra afectada y continua con el tiempo original.
-                if(cantidad_REINTENTOS==0) //Si no quiero que haya reintentos entonces que se despierte cada cierto TIEMPO_SLEEP
+                /*if(cantidad_REINTENTOS==0) //Si no quiero que haya reintentos entonces que se despierte cada cierto TIEMPO_SLEEP
                 {
 
                     //Se despierta solo con rtc       
@@ -1005,9 +1017,9 @@ bool func_leer_config(void)
                 {
                     // Acá ya probó en numero de intentos correspondientes ya que salió del while anterior. Ahora se va a dormir un tiempo random para luego despertarse e intentar nuevamente
                     //una cantidad fija dada por cantidad_REINTENTOS
-                    if(flag_error_envio==0 && (cantidad_envios - flag_error_envio - num_intentos) == 0) // Acá se generan los tiempos Random 
-                    {
-                        //T random
+                    if(flag_error_envio==0 && (cantidad_envios - flag_error_envio - num_intentos) == 0) // Acá se generan los tiempos Random en el otro código
+                    {*/
+                        /*//T random
                         // initialize random seed: 
                         srand (time(NULL));
                         
@@ -1022,8 +1034,8 @@ bool func_leer_config(void)
 
                         //Se despierta solo con rtc luego de un cierto tiempo random pues ya fallaron los intentos fijos    
                         sleep_wake_rtc_only(sleepMode,TiempoRandom);
-                        
-                        flag_error_envio = 1; // cambio el valor del flag pues sí hubo error en el envío del paquete, sólo que se contabiliza recién ahora, luego de calcular cuando volverá a enviar
+                        */
+                        /*flag_error_envio = 1; // cambio el valor del flag pues sí hubo error en el envío del paquete, sólo que se contabiliza recién ahora, luego de calcular cuando volverá a enviar
                         logInfo("flag_error_envio = %d\n\r\n",flag_error_envio);
                         
                     }else
@@ -1034,18 +1046,19 @@ bool func_leer_config(void)
                             num_intentos=num_intentos-1;// resto para que de bien el t sleep. Cuenta los intervalos de tiempo (ver mi hoja)
                         }
                         // Sleep por Tsleep - T suma -T reintento * num reintentos      
-                        sleep_wake_rtc_only(sleepMode,TIEMPO_SLEEP - SumaTiempoRandom -(num_intentos)); // Acá es donde me voy a dormir el tiempo que queda hasta TIEMPO_SLEEP que debo despertar
+                        //sleep_wake_rtc_only(sleepMode,TIEMPO_SLEEP - SumaTiempoRandom -(num_intentos)); // Acá es donde me voy a dormir el tiempo que queda hasta TIEMPO_SLEEP que debo despertar
 
                         // T suma=0
-                        SumaTiempoRandom=0;
-                        logInfo("Tiempo random total  = %d\n\r\n",SumaTiempoRandom);
+                        //SumaTiempoRandom=0;
+                        //logInfo("Tiempo random total  = %d\n\r\n",SumaTiempoRandom);
 
-                        flag_error_envio=0; // cambio el valor del flag
+                        flag_error_envio=0; // cambio el valor del flag para que pueda volver a enviar paquetes
                         logInfo("flag_error_envio = %d\n\r\n",flag_error_envio);
                     }
 
-                }               
-        
+                    
+                }*/               
+                sleep_wake_rtc_only(sleepMode,TIEMPO_SLEEP - SumaTiempoRandom);
         }
  }
 } 
