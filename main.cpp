@@ -1,7 +1,7 @@
 // Software compatible con la aplicación Configuracion_V1 
 
-// Hace hasta 3 intentos de envio, esperando TIEMPO_REINTENTOS_CONSECUTIVOS seg entre ellos
-// si falla en los 3 vuelve a intentar una vez mas despues de un tiempo random entre TIEMPO_RANDOM_SUP y TIEMPO_RANDOM_INF
+// Realiza tantos intentos como se configure cada cierto tiempo random para evitar colisiones.
+// Se pueden setear los tiempos random superior e inferior, entre ciertos límites. TIEMPO_RANDOM_SUP y TIEMPO_RANDOM_INF
 
 // Se ingresa en modo confuguracion si se preciona S2 (boton incorporado en la placa) al alimentarlo
 // la configuracion se guarda en la memoria no volatil
@@ -74,7 +74,6 @@ float K[8]; // Toma las constantes de cada caudalímetro.
 int TIEMPO_SLEEP; //En realidad es el tiempo entre envíos, no el tiempo que está durmiendo
 int unidad_TIEMPO_SLEEP;
 int cantidad_REINTENTOS;
-//int TIEMPO_REINTENTOS_CONSECUTIVOS;
 int TIEMPO_RANDOM_SUP;
 int TIEMPO_RANDOM_INF;
 
@@ -86,8 +85,8 @@ int frecSeleccionada;
 //int *modo_AI = new int[cantidad_AI]; // 0: Deshabilitada 1: Habilitada
 int modo_AI[8];// 0: Deshabilitada 1: Habilitada
 
-uint32_t Tiempo_reintento_join=60; // en seg no sé qué es
-uint32_t Tiempo_reintento_join_2=60; // en seg no sé qué es
+uint32_t Tiempo_reintento_join=360; // en seg no sé qué es
+uint32_t Tiempo_reintento_join_2=600; // en seg no sé qué es
 
 
 /////////////////////////////////////////////////////////////
@@ -143,12 +142,13 @@ AnalogIn AI_8(PA_7);  // Pin 11
 //AnalogIn AI_11(PA_2);  // Pin 2
 
 // DI a utilizar
-DigitalIn DI_Config(PC_9, PullDown); // Pin 4
-DigitalIn DI_Panel(PA_8, PullDown); // Pin 6
+DigitalIn DI_Config(PA_6, PullDown); // Pin 4
+DigitalIn DI_SwitchPuerta(PA_8, PullDown); // Pin 6
 
 // DO a utilizar
-DigitalOut Led(PC_13); // Pin 13. Este será un diodo amarillo que indica que está en modo config
-DigitalOut Led_Ok(PA_11); // Pin 11. Este será un diodo rojo que indicará fallas
+DigitalOut Led_Blue(PC_13); // Pin 13. Este será un diodo amarillo que indica que está en modo config
+DigitalOut Led_Red(PC_9); // Pin 11. Este será un diodo rojo que indicará fallas en escritura
+DigitalOut Led_Green(PA_8); //Este será el Led Azul que indicará que está todo ok
 
 Timer timer1;
 Timer timer2;
@@ -156,7 +156,7 @@ Timer timer2;
 /////*************Declaro las funciones a utilizar**********************////
 void error_1(class mbed::DigitalOut led);
 
-void parpadeo_2(class mbed::DigitalOut led);
+//void error_2(class mbed::DigitalOut led);
 
 void entrada_modo_config(class mbed::DigitalOut led);
 
@@ -180,7 +180,7 @@ void error_1(class mbed::DigitalOut led)
     }   
 }
 
-void parpadeo_2(class mbed::DigitalOut led)
+/*void error_2(class mbed::DigitalOut led)
 {
     while(1)
     {
@@ -192,7 +192,7 @@ void parpadeo_2(class mbed::DigitalOut led)
         wait(1);
         
     }
-}
+}*/
 
 void entrada_modo_config(class mbed::DigitalOut led)
 {
@@ -235,7 +235,18 @@ float funcion_calcularFrec (int ADC_leer) //Lee 8 adc distintos. Se le indica cu
                 case 4:
                         muestras=(uint16_t) (ADC_RES_Cuentas*AI_4.read());
                         break;
-                
+                case 5:
+                        muestras=(uint16_t) (ADC_RES_Cuentas*AI_5.read());
+                        break;
+                case 6:
+                        muestras=(uint16_t) (ADC_RES_Cuentas*AI_6.read());
+                        break; 
+                case 7:
+                        muestras=(uint16_t) (ADC_RES_Cuentas*AI_7.read());
+                        break;
+                case 8:
+                        muestras=(uint16_t) (ADC_RES_Cuentas*AI_8.read());
+                        break;  
             }
 
             // Si la señal supera el umbral se activa el flag y cuenta el ascenso.
@@ -316,7 +327,7 @@ void func_configuracion()
             printf("ERROR en el archivo\n\r");
         }
 
-        entrada_modo_config(Led); //Acá debería parpadear el led que te indica que estás en el modo configuración.
+        entrada_modo_config(Led_Blue); //Acá debería parpadear el led azul que te indica que estás en el modo configuración.
 
         // Se queda esperando que el usuario ponga "ok" en el inicio.
         pc.printf("Usted se encuentra en el modo configuracion. Ingrese 'ok' para continuar.\n\r");
@@ -344,7 +355,7 @@ void func_configuracion()
             pc.printf("1 - Tiempo en el que permanecerá en Modo Sleep.\n\r"); //ünica opción será en sleep.
             pc.printf("2 - Cantidad de reintentos en caso de falla de envio de dato.\n\r"); //Serán 2 por defecto
             pc.printf("3 - Limites superior de intervalo de tiempo de reintentos.\n\r"); // Esto se hará de manera aleatoria.
-            pc.printf("4 - Limites superior de intervalo de tiempo de reintentos.\n\r"); // Esto se hará de manera aleatoria.
+            pc.printf("4 - Limites inferior de intervalo de tiempo de reintentos.\n\r"); // Esto se hará de manera aleatoria.
             pc.printf("5 - Banda de Frecuencia de Operacion\n\r");
             pc.printf("6 - Configuracion de Entradas Analogicas\n\r");
             pc.scanf("%d", &indice_conf);
@@ -383,7 +394,7 @@ void func_configuracion()
                         //valor_aux=std::atoi(cadena4) ; 
                         //dot->seekUserFile(nombre_file, sizeof(int), 0);
                         if(flag_error_write < 0) // Si falla la escritura
-                            error_1(Led_Ok);  //Enciende Led Rojo intermitente 
+                            error_1(Led_Red);  //Enciende Led Rojo intermitente 
                         break;
 
                 case 2:
@@ -420,7 +431,7 @@ void func_configuracion()
 
                         //dot->seekUserFile(nombre_file, sizeof(int)*3, 0);
                         if(flag_error_write<0) //Si falla la escritura
-                            error_1(Led_Ok); //Enciende Led Rojo intermitente
+                            error_1(Led_Red); //Enciende Led Rojo intermitente
                         break;
                 
                 case 3:
@@ -440,7 +451,7 @@ void func_configuracion()
                         dot->seekUserFile(nombre_file, sizeof(int)*2, 0);
                         flag_error_write = dot->writeUserFile(nombre_file, &tiempoSuperior, sizeof(tiempoSuperior));
                         if( flag_error_write < 0)
-                            error_1(Led_Ok);
+                            error_1(Led_Red); //Enciende Led Rojo intermitente si falla la escritura
                         break;
 
                 case 4:
@@ -460,7 +471,7 @@ void func_configuracion()
                         dot->seekUserFile(nombre_file, sizeof(int)*3, 0);
                         flag_error_write = dot->writeUserFile(nombre_file, &tiempoInferior, sizeof(tiempoInferior));
                         if(flag_error_write < 0)
-                            error_1(Led_Ok);
+                            error_1(Led_Red); //Enciende Led Rojo intermitente si falla la escritura
                         break;
 
                 case 5:
@@ -476,7 +487,7 @@ void func_configuracion()
                         flag_error_write = dot->writeUserFile(nombre_file, &configFrecuencia, sizeof(configFrecuencia));
 
                         if(flag_error_write < 0) //se guarda en la memoria no volatil
-                            error_1(Led_Ok);
+                            error_1(Led_Red); //Enciende Led Rojo intermitente si falla la escritura
                         break;
                 
                 case 6:
@@ -511,7 +522,7 @@ void func_configuracion()
                         dot->seekUserFile(nombre_file,  sizeof(int)*13, 0); // Me paro luego de guardar los modos AI
                         
                         if(dot->writeUserFile(nombre_file, &K_conf, sizeof(K_conf))<0 || flag_error_write<0) //se guarda en la memoria no volatil
-                            error_1(Led_Ok);
+                            error_1(Led_Red); //Enciende Led Rojo intermitente si falla la escritura
                         break;
 
                 //case 7:
@@ -731,8 +742,8 @@ bool func_leer_config(void)
         if (func_leer_config())
         {
             //si la configuracion no se puedo leer correctamente
-            logInfo("ERROR al leer la configuracion");
-            parpadeo_2(Led_Ok);
+            logInfo("ERROR al leer la configuracion\n\r");
+            error_1(Led_Red); //Enciende Led Rojo intermitente si falla la lectura
             
         }
 
@@ -816,9 +827,9 @@ bool func_leer_config(void)
         
             
         // La primera vez que se enlaza con el Gateway
-        Led.write(1); // Pensar si conviene colocar LED Verde para dar que está ok
+        Led_Green.write(1); // Pensar si conviene colocar LED Verde para dar que está ok
         join_network(Tiempo_reintento_join); // Se une/enlaza con la red (GW) luego del tiempo que le pasas por parámetro
-        Led.write(0);
+        Led_Green.write(0);
 
         // Los primeros dos envios de prueba
         std::vector<uint8_t> tx_data;      
@@ -1061,29 +1072,4 @@ bool func_leer_config(void)
                 sleep_wake_rtc_only(sleepMode,TIEMPO_SLEEP - SumaTiempoRandom);
         }
  }
-} 
-/* void funcion(void){
-    timer1.reset();
-    timer1.start();
-    pc.printf("Hola\n\r");
-    wait(2);
-    pc.printf("Chau\n\r");
-    wait(1);
-    timer1.stop();
-    int tiempo=timer1.read_us();
-    pc.printf("tiempo= %d\n\r",tiempo);
 }
-int main()
-{
-    pc.baud(115200);
-    pc.printf("Main\n\r");
-    while(1)
-    {
-        
-        funcion();
-        
-        wait(3);
-    }
-    
-
-}*/
