@@ -88,6 +88,7 @@ int modo_AI[8];// 0: Deshabilitada 1: Habilitada
 uint32_t Tiempo_reintento_join=360; // en seg no sé qué es
 uint32_t Tiempo_reintento_join_2=600; // en seg no sé qué es
 
+int cortePanel = 1; //Variable flag que indicará si se ha cortado la tensión de panel
 
 /////////////////////////////////////////////////////////////
 // * these options must match the settings on your gateway //
@@ -135,20 +136,21 @@ AnalogIn AI_3(PA_5);  // Pin 18
 AnalogIn AI_4(PA_4);  // Pin 17
 AnalogIn AI_5(PA_1);  // Pin 16
 AnalogIn AI_6(PC_1);  // Pin 15
-AnalogIn AI_7(PA_0);  // Pin 12
+AnalogIn AI_7(PA_2);  // Pin 2
 AnalogIn AI_8(PA_7);  // Pin 11
-//AnalogIn AI_9(PA_6);  // Pin 4
-//AnalogIn AI_10(PA_3);  // Pin 3
-//AnalogIn AI_11(PA_2);  // Pin 2
+
 
 // DI a utilizar
-DigitalIn DI_Config(PA_6, PullDown); // Pin 4
-DigitalIn DI_SwitchPuerta(PA_8, PullDown); // Pin 6
+DigitalIn DI_Config(PA_6, PullNone); // Pin 4
+DigitalIn DI_Interruption(PA_0, PullNone); // Pin 12 Este pin es el único que me permite usarlo para que se despierte frente a interrupción
+
+//Entrada de interrupción real a utilizar
+InterruptIn DI_Panel(PA_3, PullNone); // Pin 3 Este es el que estará puenteado al PA_0 que es el que permite despertar.
 
 // DO a utilizar
-DigitalOut Led_Blue(PC_13); // Pin 13. Este será un diodo amarillo que indica que está en modo config
-DigitalOut Led_Red(PC_9); // Pin 11. Este será un diodo rojo que indicará fallas en escritura
-DigitalOut Led_Green(PA_8); //Este será el Led Azul que indicará que está todo ok
+DigitalOut Led_Blue(PC_13); // Pin 13. Este será un diodo azul que indica que está en modo config
+DigitalOut Led_Red(PC_9); // Pin 7. Este será un diodo rojo que indicará fallas en escritura
+DigitalOut Led_Green(PA_8); // Pin 6. Este será el Led verde que indicará que está todo ok
 
 Timer timer1;
 Timer timer2;
@@ -166,6 +168,9 @@ void func_configuracion(void);
 
 bool func_leer_config(void);
 
+void interruptPanel_fall(void);
+
+void interruptPanel_rise(void);
 
 //******************DEFINICION DE FUNCIONES*******************////
 
@@ -700,7 +705,25 @@ bool func_leer_config(void)
     return error_config;
 }
 
+void interruptPanel_fall(void)
+{
+    int leerPanel;
+    leerPanel = DI_Panel.read();
+    if (leerPanel == 0)
+    {
+        cortePanel = 0;
+    }
+}
 
+void interruptPanel_rise(void)
+{
+    int leerPanel;
+    leerPanel = DI_Panel.read();
+    if (leerPanel == 1)
+    {
+        cortePanel = 1;
+    }
+}
 
 //////////////////////////////////////////   
         
@@ -747,7 +770,7 @@ bool func_leer_config(void)
             
         }
 
-        uint8_t threshold_fallos = 2*(2*cantidad_REINTENTOS+1); // Ver esto que onda
+        uint8_t threshold_fallos = 2*(cantidad_REINTENTOS+1); // Eso indica cuántos fallos son admisibles para considerarse desconectado
         // si reintentos es 0 threshold_fallos=2  lo que equivale a dos pasadas
         // si reintentos es 1 threshold_fallos=6  lo que equivale a dos pasadas completas de intentos
         // si reintentos es 2 threshold_fallos=10  lo que equivale a dos pasadas completas de intentos
@@ -825,7 +848,9 @@ bool func_leer_config(void)
         int TiempoRandom=0;
         int SumaTiempoRandom=0;
         
-            
+        DI_Panel.fall(&interruptPanel_fall);   //Entra a esta función si detecta que hay un flanco descendente en el pin de interrupt
+        DI_Panel.rise(&interruptPanel_rise);   //Entra a esta función si solo si detecta que hay un flanco ascendente en el pin de interrupción
+        
         // La primera vez que se enlaza con el Gateway
         Led_Green.write(1); // Pensar si conviene colocar LED Verde para dar que está ok
         join_network(Tiempo_reintento_join); // Se une/enlaza con la red (GW) luego del tiempo que le pasas por parámetro
@@ -848,6 +873,7 @@ bool func_leer_config(void)
         
         std::vector<uint8_t> tx_data1; //Paquete 1 de envío de datos reales 8 bytes (separados de a 2 bytes) desde AI 1 a AI 4
         std::vector<uint8_t> tx_data2; //Paquete 2 de envío de datos reales 8 bytes (separados de a 2 bytes) desde AI 5 a AI 8
+        std::vector<uint8_t> tx_data3; //Este tendrá sólo el dato de estado de panel
 
         while (true) 
         {                 
@@ -870,6 +896,7 @@ bool func_leer_config(void)
                 //{
                     tx_data1.clear(); //Limpio el paquete 1 de datos para armar nuevo
                     tx_data2.clear(); //Limpio el paquete 2 de datos para armar nuevo
+                    tx_data3.clear(); //Limpio el paquete 3 de datos para armar uno nuevo
 
                     // Calculo de la frecuencia de 8 AI 
                     for(j=0;j<cantidad_AI; j++)
@@ -896,8 +923,13 @@ bool func_leer_config(void)
                     tx_data2.push_back(0xAA);// Tipo de Frame
                     tx_data2.push_back(0xBB);// Primer Frame
                     tx_data2.push_back(0x01);// Dato auxiliar, podria ser el nivel de campo, tension, alarma, etc
+                    
+                    tx_data3.push_back(0xAA);// Tipo de Frame
+                    tx_data3.push_back(0xBB);// Primer Frame
+                    tx_data3.push_back(0x02);// Dato auxiliar, podria ser el nivel de campo, tension, alarma, etc
+                    tx_data3.push_back(cortePanel); //Meto dato de cómo se encuentra el estado de panel
+                    send_data(tx_data3); //Esta línea quizás sea mejor ponerla en la condición del OR mas adelante
 
-                        
                     //Para los 8 AI
                     for(k=0;k<cantidad_AI; k++)
                     {
@@ -978,7 +1010,7 @@ bool func_leer_config(void)
                 //Transmision del primer msj      
                              
                 //while(((cantidad_envios - flag_error_envio - num_intentos) != 0) && (send_data(tx_data1)!=0)  ) //si no recibio el ACK en ninguna de las dos ventanas y si no se realizaron todos los intentos
-                while(((cantidad_envios - num_intentos) != 0) && ( (send_data(tx_data1)!=0) || (send_data(tx_data2)!=0) ) ) //Si no recibio el ACK en alguna de las dos ventanas (distinto de cero) y si no se realizaron todos los intentos
+                while(((cantidad_envios - num_intentos) != 0) && ( (send_data(tx_data1)!=0) || (send_data(tx_data2)!=0) || (send_data(tx_data3)!=0)) ) //Si no recibio el ACK en alguna de las dos ventanas (distinto de cero) y si no se realizaron todos los intentos
                 {
                     num_intentos++; //Va por el próximo intento pues falló alguna condición, por ej, no se recibió ACK de algun send_data   
                     logInfo("Intento numero: %d\n\r",num_intentos);    
@@ -1069,7 +1101,8 @@ bool func_leer_config(void)
 
                     
                 }*/               
-                sleep_wake_rtc_only(sleepMode,TIEMPO_SLEEP - SumaTiempoRandom);
+                //sleep_wake_rtc_only(sleepMode,TIEMPO_SLEEP - SumaTiempoRandom);
+                sleep_wake_rtc_or_interrupt(sleepMode, TIEMPO_SLEEP - SumaTiempoRandom); //Esta linea va cuando pueda probar en placa
         }
  }
 }
