@@ -1332,7 +1332,7 @@ $EndComp
 Wire Wire Line
 	14750 8000 13950 8000
 Wire Wire Line
-	13800 7750 13800 7300
+	13800 7750 13800 7400
 Text GLabel 13800 7300 1    50   Input ~ 0
 Vreg5V
 $Comp
@@ -1341,7 +1341,7 @@ U 1 1 614278AE
 P 15650 11100
 F 0 "JUSB1" V 15496 11348 50  0000 L CNN
 F 1 "Conn_01x06_Female" V 15587 11348 50  0000 L CNN
-F 2 "Connector_PinSocket_2.00mm:PinSocket_1x06_P2.00mm_Vertical" H 15650 11100 50  0001 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x06_P2.54mm_Vertical" H 15650 11100 50  0001 C CNN
 F 3 "~" H 15650 11100 50  0001 C CNN
 	1    15650 11100
 	0    1    1    0   
@@ -1384,10 +1384,6 @@ Wire Wire Line
 Wire Wire Line
 	13800 10250 13800 8250
 Wire Wire Line
-	13800 10250 15350 10250
-Wire Wire Line
-	15350 10250 15350 10900
-Wire Wire Line
 	15750 10500 15250 10500
 Connection ~ 15250 10500
 Wire Wire Line
@@ -1422,8 +1418,6 @@ Wire Wire Line
 Wire Wire Line
 	13500 10250 13500 10050
 Connection ~ 13500 10050
-Wire Wire Line
-	13500 10050 14400 10050
 $Comp
 L Device:R RModo1
 U 1 1 614F8B98
@@ -1499,9 +1493,9 @@ Connection ~ 13700 8800
 Wire Wire Line
 	13700 8800 13700 8400
 Text GLabel 14950 10050 1    50   Input ~ 0
-3.3VMdot
+3VMdot
 Text GLabel 13800 9450 2    50   Input ~ 0
-3.3VUSB
+5VUSB
 $Comp
 L Connector:Conn_01x10_Female JderMDOT1
 U 1 1 6159F6EE
@@ -1611,7 +1605,7 @@ Text GLabel 16900 8500 2    50   Input ~ 0
 AI6
 Text GLabel 16900 8700 2    50   Input ~ 0
 DO1
-Text GLabel 16900 8800 2    50   Input ~ 0
+Text GLabel 14250 8100 0    50   Input ~ 0
 AI7
 Text GLabel 16900 8900 2    50   Input ~ 0
 AI8
@@ -1646,20 +1640,11 @@ $EndComp
 Wire Wire Line
 	12450 7600 12600 7600
 Wire Wire Line
-	12600 7600 12600 7450
-Wire Wire Line
 	11650 8300 11650 9000
 Wire Wire Line
 	11650 8000 11650 7800
 Wire Wire Line
 	12650 8300 14750 8300
-Wire Wire Line
-	12600 7450 14400 7450
-Wire Wire Line
-	14400 7450 14400 10050
-Connection ~ 14400 10050
-Wire Wire Line
-	14400 10050 15150 10050
 Wire Wire Line
 	11650 7800 12050 7800
 Connection ~ 11650 7800
@@ -1669,16 +1654,13 @@ Text GLabel 12050 7800 2    50   Input ~ 0
 DIPuerta
 Wire Wire Line
 	12450 7400 12600 7400
-Wire Wire Line
-	12600 7400 12600 7450
-Connection ~ 12600 7450
 NoConn ~ 15350 9400
 NoConn ~ 15450 9400
 NoConn ~ 15550 9400
 NoConn ~ 15650 9400
 NoConn ~ 16200 8600
 NoConn ~ 15450 10900
-NoConn ~ 15850 10900
+NoConn ~ 15350 10900
 Wire Wire Line
 	15750 10500 15750 10900
 $Comp
@@ -1761,8 +1743,6 @@ F 3 "" H 21100 1250 50  0001 C CNN
 	1    21100 1250
 	1    0    0    -1  
 $EndComp
-Text GLabel 21100 1300 2    50   Input ~ 0
-Vreg5V
 $Comp
 L Transistor_BJT:BC337 Q2
 U 1 1 612D7A00
@@ -1843,8 +1823,6 @@ F 3 "" H 19000 1250 50  0001 C CNN
 	1    19000 1250
 	1    0    0    -1  
 $EndComp
-Text GLabel 19000 1300 2    50   Input ~ 0
-Vreg5V
 $Comp
 L Transistor_BJT:BC337 Q3
 U 1 1 612F3F10
@@ -1925,8 +1903,6 @@ F 3 "" H 16700 1200 50  0001 C CNN
 	1    16700 1200
 	1    0    0    -1  
 $EndComp
-Text GLabel 16700 1250 2    50   Input ~ 0
-Vreg5V
 Text GLabel 17800 2350 0    50   Input ~ 0
 DO2
 Text GLabel 15500 2300 0    50   Input ~ 0
@@ -1934,14 +1910,72 @@ DO3
 Text GLabel 19900 2350 0    50   Input ~ 0
 DO1
 $Comp
-L Switch:SW_Push_Open_Dual SWPuertaNC1
+L Switch:SW_Push_Open_Dual SWPanel1
 U 1 1 617A3C9D
 P 12250 7400
-F 0 "SWPuertaNC1" H 12250 7610 50  0000 C CNN
+F 0 "SWPanel1" H 12250 7610 50  0000 C CNN
 F 1 "SW_Push_Open_Dual" H 12250 7519 50  0000 C CNN
 F 2 "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2_1x02_P5.00mm_Horizontal" H 12250 7600 50  0001 C CNN
 F 3 "~" H 12250 7600 50  0001 C CNN
 	1    12250 7400
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	13500 10050 13650 10050
+Wire Wire Line
+	12600 7400 12600 7600
+Wire Wire Line
+	12600 7400 12850 7400
+Connection ~ 12600 7400
+Connection ~ 13800 7400
+Wire Wire Line
+	13800 7400 13800 7300
+Wire Wire Line
+	14250 8100 14750 8100
+Text GLabel 16900 8800 2    50   Input ~ 0
+DIPuerta
+Wire Wire Line
+	15850 10250 15850 10900
+Wire Wire Line
+	13800 10250 15850 10250
+Text GLabel 14450 8000 1    50   Input ~ 0
+VccMDOT
+Text GLabel 16700 1250 2    50   Input ~ 0
+VccMDOT
+Text GLabel 19000 1300 2    50   Input ~ 0
+VccMDOT
+Text GLabel 21100 1300 2    50   Input ~ 0
+VccMDOT
+$Comp
+L Jumper:Jumper_3_Open JPSWPUERTA1
+U 1 1 6128AE99
+P 13000 7400
+F 0 "JPSWPUERTA1" V 12954 7487 50  0000 L CNN
+F 1 "Jumper_3_Open" V 13045 7487 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 13000 7400 50  0001 C CNN
+F 3 "~" H 13000 7400 50  0001 C CNN
+	1    13000 7400
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	13350 7400 13800 7400
+Wire Wire Line
+	13350 7400 13350 7150
+Wire Wire Line
+	13350 7150 13000 7150
+Wire Wire Line
+	13000 7650 13000 7800
+Wire Wire Line
+	13000 7800 12750 7800
+Wire Wire Line
+	12750 7800 12750 9500
+Wire Wire Line
+	12750 9500 13650 9500
+Wire Wire Line
+	13650 9500 13650 10050
+Connection ~ 13650 10050
+Wire Wire Line
+	13650 10050 15150 10050
+NoConn ~ 14750 8700
+NoConn ~ 14750 8800
 $EndSCHEMATC

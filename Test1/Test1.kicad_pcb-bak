@@ -1026,7 +1026,7 @@
   )
 
   (module LED_THT:LED_D5.0mm (layer F.Cu) (tedit 5995936A) (tstamp 6125A3BF)
-    (at 216 58.5)
+    (at 160.615001 36.055001)
     (descr "LED, diameter 5.0mm, 2 pins, http://cdn-reichelt.de/documents/datenblatt/A500/LL-504BC2E-009.pdf")
     (tags "LED diameter 5.0mm 2 pins")
     (path /611B06C6)
@@ -1062,7 +1062,7 @@
   )
 
   (module LED_THT:LED_D5.0mm (layer F.Cu) (tedit 5995936A) (tstamp 6125A3D1)
-    (at 207 58.5)
+    (at 170.425001 27.115001)
     (descr "LED, diameter 5.0mm, 2 pins, http://cdn-reichelt.de/documents/datenblatt/A500/LL-504BC2E-009.pdf")
     (tags "LED diameter 5.0mm 2 pins")
     (path /612D7A0C)
@@ -1098,7 +1098,7 @@
   )
 
   (module LED_THT:LED_D5.0mm (layer F.Cu) (tedit 5995936A) (tstamp 6125A3E3)
-    (at 198 58.5)
+    (at 220.175001 31.845001)
     (descr "LED, diameter 5.0mm, 2 pins, http://cdn-reichelt.de/documents/datenblatt/A500/LL-504BC2E-009.pdf")
     (tags "LED diameter 5.0mm 2 pins")
     (path /612F3F1C)
@@ -1981,7 +1981,7 @@
   )
 
   (module Connector_PinHeader_2.00mm:PinHeader_1x08_P2.00mm_Vertical (layer F.Cu) (tedit 59FED667) (tstamp 6126BC51)
-    (at 151.5 98.5 180)
+    (at 156 100 180)
     (descr "Through hole straight pin header, 1x08, 2.00mm pitch, single row")
     (tags "Through hole pin header THT 1x08 2.00mm single row")
     (path /6143BCED)
@@ -2095,7 +2095,7 @@
   )
 
   (module Connector_PinSocket_2.00mm:PinSocket_1x10_P2.00mm_Vertical (layer F.Cu) (tedit 5A19A430) (tstamp 6126B6D0)
-    (at 179.5 102.5 270)
+    (at 184 104 270)
     (descr "Through hole straight socket strip, 1x10, 2.00mm pitch, single row (from Kicad 4.0.7), script generated")
     (tags "Through hole socket strip THT 1x10 2.00mm single row")
     (path /6159F6EE)
@@ -2151,7 +2151,7 @@
   )
 
   (module Connector_PinSocket_2.00mm:PinSocket_1x10_P2.00mm_Vertical (layer F.Cu) (tedit 5A19A430) (tstamp 6125A6B4)
-    (at 179.5 80.5 270)
+    (at 184 82 270)
     (descr "Through hole straight socket strip, 1x10, 2.00mm pitch, single row (from Kicad 4.0.7), script generated")
     (tags "Through hole socket strip THT 1x10 2.00mm single row")
     (path /613D7D58)
@@ -2353,7 +2353,7 @@
   )
 
   (module Connector_PinSocket_2.54mm:PinSocket_1x06_P2.54mm_Vertical (layer F.Cu) (tedit 5A19A430) (tstamp 6125A728)
-    (at 142.5 85)
+    (at 147 86.5)
     (descr "Through hole straight socket strip, 1x06, 2.54mm pitch, single row (from Kicad 4.0.7), script generated")
     (tags "Through hole socket strip THT 1x06 2.54mm single row")
     (path /614278AE)
@@ -3620,7 +3620,7 @@
   )
 
   (module Button_Switch_THT:SW_PUSH_6mm_H4.3mm (layer F.Cu) (tedit 5A02FE31) (tstamp 6125A9EA)
-    (at 181.5 55.825)
+    (at 182.245 55.825)
     (descr "tactile push button, 6x6mm e.g. PHAP33xx series, height=4.3mm")
     (tags "tact sw push 6mm")
     (path /614D13EC)
@@ -3784,7 +3784,7 @@
   )
 
   (module Package_DIP:DIP-8_W10.16mm_LongPads (layer F.Cu) (tedit 5A02E8C5) (tstamp 6126B1E8)
-    (at 203.5 100.92)
+    (at 217.805 96.52)
     (descr "8-lead though-hole mounted DIP package, row spacing 10.16 mm (400 mils), LongPads")
     (tags "THT DIP DIL PDIP 2.54mm 10.16mm 400mil LongPads")
     (path /610B63F4)
@@ -3836,7 +3836,7 @@
   )
 
   (module Package_DIP:DIP-8_W10.16mm_LongPads (layer F.Cu) (tedit 5A02E8C5) (tstamp 6125AA6D)
-    (at 203.5 75.96)
+    (at 127.085001 20.665001)
     (descr "8-lead though-hole mounted DIP package, row spacing 10.16 mm (400 mils), LongPads")
     (tags "THT DIP DIL PDIP 2.54mm 10.16mm 400mil LongPads")
     (path /6110F78F)
@@ -3888,7 +3888,7 @@
   )
 
   (module Package_DIP:DIP-8_W10.16mm_LongPads (layer F.Cu) (tedit 5A02E8C5) (tstamp 6125AA89)
-    (at 220.5 75.92)
+    (at 150.385001 0.305001)
     (descr "8-lead though-hole mounted DIP package, row spacing 10.16 mm (400 mils), LongPads")
     (tags "THT DIP DIL PDIP 2.54mm 10.16mm 400mil LongPads")
     (path /611377F2)
@@ -3940,7 +3940,7 @@
   )
 
   (module Package_DIP:DIP-8_W10.16mm_LongPads (layer F.Cu) (tedit 5A02E8C5) (tstamp 6125AAA5)
-    (at 220.5 100.92)
+    (at 219.71 76.2)
     (descr "8-lead though-hole mounted DIP package, row spacing 10.16 mm (400 mils), LongPads")
     (tags "THT DIP DIL PDIP 2.54mm 10.16mm 400mil LongPads")
     (path /6113786F)
