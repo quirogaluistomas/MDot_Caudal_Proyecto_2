@@ -1978,4 +1978,20 @@ Wire Wire Line
 	13650 10050 15150 10050
 NoConn ~ 14750 8700
 NoConn ~ 14750 8800
+Text GLabel 4950 8150 1    50   Input ~ 0
+3VMdot
+Text GLabel 2550 8150 1    50   Input ~ 0
+3VMdot
+Text GLabel 2550 5750 1    50   Input ~ 0
+3VMdot
+Text GLabel 4950 5750 1    50   Input ~ 0
+3VMdot
+Text GLabel 2550 3400 1    50   Input ~ 0
+3VMdot
+Text GLabel 4950 3400 1    50   Input ~ 0
+3VMdot
+Text GLabel 2550 1000 1    50   Input ~ 0
+3VMdot
+Text GLabel 4950 1000 1    50   Input ~ 0
+3VMdot
 $EndSCHEMATC
