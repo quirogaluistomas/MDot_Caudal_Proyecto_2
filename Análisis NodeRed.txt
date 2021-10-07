@@ -1,0 +1,39 @@
+Llega paquete LoRa y tengo por un lado, el bloque "msg" donde veo el objeto completo, tal cual llega el paquete en JSON.
+
+Bloque "Filtrado de Nodos"
+
+Creo variable Payload que tendrá efectivamente el atributo payload del objeto paquete. A su vez puedo tomar el RSSI, SNR, timestamp, deveui, etc..que 
+son atributos que agrega el GW al paquete (o el nodo cuando arma el paquete) y que pueden resultar de interés.
+
+Como el dato llega en decimal pero se envió en hexa, entonces para poder identificar de qué tipo de Nodo proviene, paso todo a decimal y listo. Tomando
+de a byte y haciendo corrimiento para pasar AABB00 a decimal y así..
+
+Ahora switcheas y derivás a cada lado, en función de qué nodo proviene. A mi sólo me interesa el caudal. Creo mi propio paquete.
+Allí mismo se crea el mensaje y se le  asigna al atributo "nodo" un número en función del tipo. A su vez se asigna al atributo "payload" la información 
+que a mi me interesa:
+dato: Payload, deveui: msg.deveui, tiempo: msg.time, RSSI: msg.rssi, SNR: msg.lsnr.
+
+Bloque Caudal AI1-4
+
+Luego de envía al bloque de función correspondiente de Caudal. Acá es donde se crea el topico LORA/Caudal/+DEVEUI.. sólo para probar si toma bien el
+dato, luego le cambio el topico a algo mas mio.
+
+Guardo en datoDecimal el payload con todos los datos que me interesaron antes. En dato guardo la devolución de la función decoPulsos(datoDecimal) que
+lo que hace es basicamente esta función es tomar los datos de caudal o frecuencia del paquete, la posición 0, 1 y 2 son de AA, BB, 0X; es decir, recordar
+que los datos vienen de a 2 bytes y en el vector se guarda de a byte, parte alta y parte baja. Devuelve el vector de valores.
+
+Luego se arma un msjX para cada AI con su respectivo topico. Además se arma un msj para el timestamp, otro para DevEui, otro para RSSI y otro para
+SNR. Se devuelve el vector de mensajes completo.
+
+
+Bloque Caudal AI5-8
+
+Acá se hace lo mismo que en el otro bloque pero con la diferencia que no se guardan los datos de timestamp, DevEui, RSSI y SNR.
+
+Bloque Caudal DI
+
+Acá lo toqueteé yo pidiendo el estado de la entrada digital.
+
+
+
+

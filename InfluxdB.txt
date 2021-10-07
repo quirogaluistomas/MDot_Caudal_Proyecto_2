@@ -1,0 +1,29 @@
+Se descarga influxdB desde la página para windows o linux o lo que sea.
+
+Se descomprime los ejecutables en algun directorio y se ejecuta el motor "influxd.exe" para poder correr el gestor de base de datos, luego se ejecuta el
+"influx.exe" para abrir la consola donde se pueden tirar las querys. Por defecto corre en la ip local en el puerto 8086. Los bloques influxdb se
+descargan en el mismo nodered.
+
+Algunos conceptos:
+
+	dabatase: base de datos
+	measurement: tabla de datos
+
+Para crear base de datos ---> CREATE database "nombre de la db que quiero"
+Para crear una tabla de datos ---> CREATE measurement "nombre de la tabla de medicion"
+Para pararte sobre una base de datos a usar ---> USE "nombre de la base de datos"
+Para mostrar todas las bases de datos ----> show databases
+Para mostrar mediciones ---> show measurements
+Para ver una tabla ---> SELECT "campo" from "nombre de tabla de medición"
+Para eliminar una db ---> DROP database "nombre de la db a eliminar"
+Para eliminar una tabla ---> DROP measurement "nombre de la tabla a eliminar"
+
+
+Algunos parámetros que se pueden tomar que estan buenos 
+
+
+mean : valor medio de las mediciones
+stddev : desviación estándar del campo
+spread : Diferencia entre max y minimo
+
+

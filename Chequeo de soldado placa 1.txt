@@ -1,0 +1,42 @@
+Se conectan primero las vias y se chequea continuidad.      OK
+
+Se conectan las resistencias de 1M y se chequean continuidad entre 3vmdot y gnd.     OK
+
+Se conectan las resistencias de 220k y se chequean continuidad entre 3vmdot y gnd.    OK
+
+Resistencia 10K de Switch de Puerta que es pull down cuando se desconect panel.      OK
+
+Integrado U1    OK
+
+Rmodo pull down de 10k en lugar de 1k    OK
+
+Diodos de los reguladores    OK
+
+Diodos schotky 1N5819 (son los que tenia en Comodor, en realidad van 5817)  en damez
+
+Resistencias de transistores 220      OK
+
+Transistores    OK
+
+Pines hembra de mdot   OK
+
+Pines macho de mdot   OK
+
+Pines hembra USB    OK
+
+Jumpers     OK
+
+Botones    OK
+
+Capacitor 22u   OK
+
+Resistencia de 1k del primer regulador    OK
+
+Diodos Zener se liman -> Agrandar agujero en PCB como tamaño bornera
+
+Diodo Led Rojo    OK   --> VAN EN COLOR COMO TELEFE, ROJO VERDE Y AZUL
+
+Fusilera    OK
+
+
+ 	

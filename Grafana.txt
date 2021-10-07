@@ -1,0 +1,10 @@
+Grafana se instala metiendose en la página y eligiendo la versión para windows, etc
+Corre en servidor local escuchando el puerto 3000. Yo ya tengo creada una cuenta con mi mail de gmail "quirogaluistomas@gmail.com" con la contraseña
+"luchynfull"
+
+De esta manera uno ya puede acceder al mismo a través de dicho puerto. Abrí el puerto a la red para que los ordenadores que se encuentran en la misma
+red puedan acceder al grafana poniendo mi ip y puerto.
+
+En "Configurations" --> "Data Sources" creo la tabla de datos y le indico de qué tipo será y a dónde se encuentra el servidor. Luego "Save and Apply"
+
+Luego para crear los dashboards inserto yo mismo la query a la dB para poder mostrar lo que a mi se me ocurra. Acá hay que jugar.

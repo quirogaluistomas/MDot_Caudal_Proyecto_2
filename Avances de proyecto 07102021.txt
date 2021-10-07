@@ -1,0 +1,20 @@
+Hoy pude probar todas las entradas analógicas, una por vez, y anduvieron todas. Solucioné algunos problemas que habia de mal contacto debido a que no
+soldé todas las patas de los integrados de 3.3V. Por otra parte al principio habia una tensión de 8,5V en el pin de salida Vout del mdot (aunque este no
+estuviese conectado) debido a que el diodo 1N4007 no estaba bien conectado a la patita del medio del 317 y de esa forma generaba un camino hacia 3Vmdot,
+es decir, hacia la alimentación de los opamps y el pin numero 24 del mdot.
+
+Se probó el reset y dio todo ok, resetea como corresponde.
+Se prende el Led Verde como corresponde cuando se resetea o cuando se alimenta el mdot.
+
+Hay un problema debido a la falta de metalizado en las vías que no lee bien la DI_Panel aunque sí está conectado el pin de wakeup a la bornera de corte
+de panel. Detecta bien el corte de panel y el cambio de estado con lo cual el código está correcto.
+
+Falta chequear conectado con panel solar y batería, ajustar el preset para que regule a tensión de bateria (12V) y ver que todo funcione correctamente.
+
+Por otra parte, falta ver que funcione el "modo configuración" para setearle las entradas, etc.
+
+Queda por probar las continuidades de los pines que irán al usb, que todo sea como uno espera.
+
+Si todo esto funciona, podemos mandar a hacer la placa definitiva, modificando el footprint del integrado opamp y el del diodo zener que tiene que tener
+agujeros mas grandes. Tal vez se podría mover un poco mas los pines hembra del USB para alejarlo del fusible.
+

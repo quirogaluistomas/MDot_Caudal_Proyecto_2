@@ -322,8 +322,8 @@ void func_configuracion()
         float aux2 = 0; // Variable a utilizar para los coeficientes K
         int valor_aux=0;
         int valor_aux_2=0;
-        char ok[3]="\0";
-
+        //char ok[3]="\0";
+        int ok;
          
         // Existe un struct que tiene una variable fd con tipo de dato int16. Si ese valor es negativo implica que
         // hay error en la carga de archivo.
@@ -335,10 +335,10 @@ void func_configuracion()
         entrada_modo_config(Led_Blue); //Acá debería parpadear el led azul que te indica que estás en el modo configuración.
 
         // Se queda esperando que el usuario ponga "ok" en el inicio.
-        pc.printf("Usted se encuentra en el modo configuracion. Ingrese 'ok' para continuar.\n\r");
-        pc.scanf("%s",ok);
+        pc.printf("Usted se encuentra en el modo configuracion. Ingrese '0' para continuar.\n\r");
+        pc.scanf("%d",&ok);
 
-        if(strcmp(ok, "ok")==0)
+        if(ok == 0)
         {
                 pc.printf("%d_\n\r", cantidad_AI);     //Calculo que esto es solo para printear cuantas entradas AI hay. Se podría omitir o agregar mas info         
         }
@@ -356,7 +356,7 @@ void func_configuracion()
             float K_conf[cantidad_AI];
 
             // Se queda esperando en consola a que llegue el indicador
-            pc.printf("Indique el numero correspondiente de las siguientes opciones para configurar:\n\r ");
+            pc.printf("Indique el numero correspondiente de las siguientes opciones para configurar:\n\r");
             pc.printf("1 - Tiempo en el que permanecerá en Modo Sleep.\n\r"); //ünica opción será en sleep.
             pc.printf("2 - Cantidad de reintentos en caso de falla de envio de dato.\n\r"); //Serán 2 por defecto
             pc.printf("3 - Limites superior de intervalo de tiempo de reintentos.\n\r"); // Esto se hará de manera aleatoria.
@@ -713,6 +713,7 @@ void interruptPanel_fall(void)
     {
         cortePanel = 0;
     }
+    //cortePanel = 0;
 }
 
 void interruptPanel_rise(void)
@@ -723,6 +724,7 @@ void interruptPanel_rise(void)
     {
         cortePanel = 1;
     }
+    //cortePanel = 1;
 }
 
 //////////////////////////////////////////   
@@ -730,7 +732,7 @@ void interruptPanel_rise(void)
  int main() {
     
     pc.baud(115200);
-    int test = 0; //Eliminar esta linea y reemplazar en el if por DI_conf
+    //int test = 0; //Eliminar esta linea y reemplazar en el if por DI_conf
     plan = new lora::ChannelPlan_US915();//por defecto para que arranque se modifica con la configuracion el valor de plan
     MBED_ASSERT(plan);
 
@@ -746,10 +748,10 @@ void interruptPanel_rise(void)
         nombre_file = dot->openUserFile("ArchivoConfig.txt", (1 << 3)|(1 << 4));
     }
         
-    pc.printf("Ingrese 1 para cargar conf: \n\r"); // Hay que eliminar esta parte
-    pc.scanf("%d\n\r", &test); // Hay que eliminar esta parte, sólo es para prueba
+    //pc.printf("Ingrese 1 para cargar conf: \n\r"); // Hay que eliminar esta parte
+    //pc.scanf("%d\n\r", &test); // Hay que eliminar esta parte, sólo es para prueba
 
-    if(test == 1)   
+    if(DI_Config)   
     {
         // Configuracion
         func_configuracion();     
@@ -1010,7 +1012,7 @@ void interruptPanel_rise(void)
                 //Transmision del primer msj      
                              
                 //while(((cantidad_envios - flag_error_envio - num_intentos) != 0) && (send_data(tx_data1)!=0)  ) //si no recibio el ACK en ninguna de las dos ventanas y si no se realizaron todos los intentos
-                while(((cantidad_envios - num_intentos) != 0) && ( (send_data(tx_data1)!=0) || (send_data(tx_data2)!=0) || (send_data(tx_data3)!=0)) ) //Si no recibio el ACK en alguna de las dos ventanas (distinto de cero) y si no se realizaron todos los intentos
+                while(((cantidad_envios - num_intentos) != 0) && ( (send_data(tx_data1)!=0) || (send_data(tx_data2)!=0)) || (send_data(tx_data3)!=0) ) //Si no recibio el ACK en alguna de las dos ventanas (distinto de cero) y si no se realizaron todos los intentos
                 {
                     num_intentos++; //Va por el próximo intento pues falló alguna condición, por ej, no se recibió ACK de algun send_data   
                     logInfo("Intento numero: %d\n\r",num_intentos);    
