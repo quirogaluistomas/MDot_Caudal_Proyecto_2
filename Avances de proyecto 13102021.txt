@@ -1,0 +1,16 @@
+Hoy se probó la parte de usb serie y funciona bien, se pueden enviar los parámetros por allí cambiando los jumpers de lugar alimentando el mdot con el 
+USB y no con la fuente.
+
+Surgió un problema cuando se desea calcular el caudal ya que aparentemente hay un problemita con cómo guarda en el archivo las constantes K.
+Aparentemente el problema proviene o bien de cómo se envía por el putty o por cómo crea el espacio de los archivos cuando guarda o cuando lee, hay que
+realizar varias pruebas para descartar dónde está el quilombito. Se modificó el código para que el modo configuración prenda el led amarillo unos 15 seg
+en lugar de 5seg ya que el proceso es: mantener apretado el boton "modo", al mismo tiempo enchufar el usb a la compu, soltar el botón e iniciar el putty
+antes de que se apague el led.
+
+También se modificó el código en la parte del tamaño del vector CONFIGURACIÓN, y cómo guarda y lee, se tocó el tamaño de 12 por el 13 en un lugar. Hay
+que chequear esto.
+
+Nota: Modifiqué el tamaño de la creación del archivo en float de 8 a 4, la mitad...por qué? Porque así está en el otro código, para 4 AI decía 2 y 4 para
+el de 8...asique supongo que va asi.
+
+Mañana probar pararme en sizeof(int)*12 + sizeof(float) para guardar los k, por otro lado probar de guardarlos como enteros en CONFIGURACION.

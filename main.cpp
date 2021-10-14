@@ -51,28 +51,25 @@ int frec_ch_int[8];
 int flag_configuracion=0;
 //int TIEMPOS[5];
 
-int CONFIGURACION[15];
+int CONFIGURACION[13];
 //[0] TIEMPO_SLEEP;
-//[1] unidad_TIEMPO_SLEEP;
-//[2] cantidad_REINTENTOS;
-//[3] TIEMPO_REINTENTOS_CONSECUTIVOS;
-//[4] TIEMPO_RANDOM_SUP;
-//[5] TIEMPO_RANDOM_INF;
-//[6] seleccion_frec;
-//[7] modo_AI[0];
-//[8] modo_AI[1];
-//[9] modo_AI[2];
-//[10] modo_AI[3];
-//[11] modo_AI[4];
-//[12] modo_AI[5];
-//[13] modo_AI[6];
-//[14] modo_AI[7];
+//[1] cantidad_REINTENTOS;
+//[2] TIEMPO_RANDOM_SUP;
+//[3] TIEMPO_RANDOM_INF;
+//[4] seleccion_frec;
+//[5] modo_AI[0];
+//[6] modo_AI[1];
+//[7] modo_AI[2];
+//[8] modo_AI[3];
+//[9] modo_AI[4];
+//[10] modo_AI[5];
+//[11] modo_AI[6];
+//[12] modo_AI[7];
 
 //float *K = new float[cantidad_AI]; // Toma las constantes de cada caudalímetro.
 float K[8]; // Toma las constantes de cada caudalímetro.
 
 int TIEMPO_SLEEP; //En realidad es el tiempo entre envíos, no el tiempo que está durmiendo
-int unidad_TIEMPO_SLEEP;
 int cantidad_REINTENTOS;
 int TIEMPO_RANDOM_SUP;
 int TIEMPO_RANDOM_INF;
@@ -203,7 +200,7 @@ void entrada_modo_config(class mbed::DigitalOut led)
 {
     // indica que se ingreso en el modo configuracion. Se prende 5 segundos y se apaga.
     led.write(1);
-    wait(5);
+    wait(15);
     led.write(0);
    
 }
@@ -322,7 +319,6 @@ void func_configuracion()
         float aux2 = 0; // Variable a utilizar para los coeficientes K
         int valor_aux=0;
         int valor_aux_2=0;
-        //char ok[3]="\0";
         int ok;
          
         // Existe un struct que tiene una variable fd con tipo de dato int16. Si ese valor es negativo implica que
@@ -338,26 +334,22 @@ void func_configuracion()
         pc.printf("Usted se encuentra en el modo configuracion. Ingrese '0' para continuar.\n\r");
         pc.scanf("%d",&ok);
 
-        if(ok == 0)
-        {
-                pc.printf("%d_\n\r", cantidad_AI);     //Calculo que esto es solo para printear cuantas entradas AI hay. Se podría omitir o agregar mas info         
-        }
+        //if(ok == 0)
+        //{
+        //        pc.printf("%d_\n\r", cantidad_AI);     //Calculo que esto es solo para printear cuantas entradas AI hay. Se podría omitir o agregar mas info         
+        //}
 
         
 
         while(1)
         {
             
-            char cadena2[8]="\0";
-            char cadena3[3]="\0";
-            char cadena4[2]="\0";
-
             int modo_AI_conf[cantidad_AI];
             float K_conf[cantidad_AI];
 
             // Se queda esperando en consola a que llegue el indicador
             pc.printf("Indique el numero correspondiente de las siguientes opciones para configurar:\n\r");
-            pc.printf("1 - Tiempo en el que permanecerá en Modo Sleep.\n\r"); //ünica opción será en sleep.
+            pc.printf("1 - Tiempo en el que permanecera en Modo Sleep.\n\r"); //ünica opción será en sleep.
             pc.printf("2 - Cantidad de reintentos en caso de falla de envio de dato.\n\r"); //Serán 2 por defecto
             pc.printf("3 - Limites superior de intervalo de tiempo de reintentos.\n\r"); // Esto se hará de manera aleatoria.
             pc.printf("4 - Limites inferior de intervalo de tiempo de reintentos.\n\r"); // Esto se hará de manera aleatoria.
@@ -374,67 +366,25 @@ void func_configuracion()
                         pc.scanf("%d", &tiempoSleep);
                         pc.printf("%d\n\r", tiempoSleep);
 
-                        //pc.scanf("%d",cadena2);
-                        //pc.scanf("%s",cadena3);                   
-                        //pc.scanf("%s",cadena4);
-                        // msj 1 : digito1 y digito2
-                        // msj 2 : digito3 
-                        // msj 3 : unidad
-
-                        //if(strcmp(cadena3, "_")!=0) //tres digitos
-                        //    strcat(cadena2, cadena3); // dato de tiempo completo                         
-
-
-                        // paso el tiempo a segundos
-                        //valor_aux = std::atoi(cadena2);
-
-                        //valor_aux_2 = valor_aux * int(std::pow(double(60),(std::atoi(cadena4)))); 
-                        
                         
                         // Escribe valor temporal
                         dot->seekUserFile(nombre_file, 0, 0);
                         flag_error_write = dot->writeUserFile(nombre_file, &tiempoSleep, sizeof(tiempoSleep)); // Devuelve -1 si hay error. //Se guarda en memoria flash (no volátil)
 
-                        // Escribe unidad de tiempo [hora min seg]
-                        //valor_aux=std::atoi(cadena4) ; 
-                        //dot->seekUserFile(nombre_file, sizeof(int), 0);
                         if(flag_error_write < 0) // Si falla la escritura
                             error_1(Led_Red);  //Enciende Led Rojo intermitente 
                         break;
 
                 case 2:
                         // TIEMPO_REINTENTOS_CONSECUTIVOS
-                        //char cadena_aux[2];
-                        //pc.scanf("%s",cadena_aux);
-                        // msj 1 : num_reintentos
-                        //valor_aux= std::atoi(cadena_aux);// cantidad de reintentos
+ 
                         pc.printf("Ingrese la cantidad de reintentos en caso de que falle la comunicacion: \n\r");
                         pc.scanf("%d", &cantReintentos);
                         pc.printf("%d\n\r", cantReintentos);
 
-                        if(cantReintentos!=0)
-                        {
-                            //pc.scanf("%s",cadena2);
-                            //pc.scanf("%s",cadena3);
-                            
-                            // msj 2 : digito1 y digito2
-                            // msj 3 : digito3
-                       
-                            //if(strcmp(cadena3, "_")!=0)
-                            //    strcat(cadena2, cadena3);
-                            
-                            //valor_aux_2= std::atoi(cadena2);// tiempo en segundos
-
-                        }else
-                        {
-                            //valor_aux_2=0; // si los reintentos son 0, el tiempo de reintento tambien es 0
-                        }
-
-                        //dot->seekUserFile(nombre_file, sizeof(int)*2, 0);
                         dot->seekUserFile(nombre_file, sizeof(int), 0);
                         flag_error_write = dot->writeUserFile(nombre_file, &cantReintentos, sizeof(cantReintentos)); //Se guarda en memoria flash (no volátil)
 
-                        //dot->seekUserFile(nombre_file, sizeof(int)*3, 0);
                         if(flag_error_write<0) //Si falla la escritura
                             error_1(Led_Red); //Enciende Led Rojo intermitente
                         break;
@@ -444,15 +394,7 @@ void func_configuracion()
                         pc.printf("Ingrese el limite de tiempo superior: \n\r");
                         pc.scanf("%d", &tiempoSuperior);
                         pc.printf("%d\n\r", tiempoSuperior);
-                        // pc.scanf("%s",cadena2);
-                        // pc.scanf("%s",cadena3);
-                        // msj 1 : digito1 y digito2
-                        // msj 2 : digito3
 
-                        //if(strcmp(cadena3, "_")!=0)
-                        //    strcat(cadena2, cadena3);
-
-                        //valor_aux= std::atoi(cadena2);// tiempo en segundos
                         dot->seekUserFile(nombre_file, sizeof(int)*2, 0);
                         flag_error_write = dot->writeUserFile(nombre_file, &tiempoSuperior, sizeof(tiempoSuperior));
                         if( flag_error_write < 0)
@@ -464,15 +406,7 @@ void func_configuracion()
                         pc.printf("\n\rIngrese el limite de tiempo inferior: \n\r");
                         pc.scanf("%d", &tiempoInferior);
                         pc.printf("%d\n\r", tiempoInferior);
-                        //pc.scanf("%s",cadena2);
-                        //pc.scanf("%s",cadena3);
-                        // msj 1 : digito1 y digito2
-                        // msj 2 : digito3
 
-                        //if(strcmp(cadena3, "_")!=0)
-                        //    strcat(cadena2, cadena3);
-
-                        //valor_aux= std::atoi(cadena2);// tiempo en segundos
                         dot->seekUserFile(nombre_file, sizeof(int)*3, 0);
                         flag_error_write = dot->writeUserFile(nombre_file, &tiempoInferior, sizeof(tiempoInferior));
                         if(flag_error_write < 0)
@@ -481,8 +415,7 @@ void func_configuracion()
 
                 case 5:
                         // Configuracion frec
-                        //pc.scanf("%s",cadena2);
-                        //valor_aux= std::atoi(cadena2);
+
                         pc.printf("1 - AU915 \n\r");
                         pc.printf("2 - US915 \n\r");
                         pc.scanf("%d", &configFrecuencia);
@@ -507,8 +440,6 @@ void func_configuracion()
                             pc.printf("Habilitar entrada de caudal %d \n\r", i+1);
                             pc.scanf("%d",&aux);
                             pc.printf("%d\n\r", aux);
-                            //pc.scanf("%s",cadena2);
-                            //modo_AI_aux[i] = std::atoi(cadena2);
                             modo_AI_conf[i] = aux;
                         }
 
@@ -518,7 +449,7 @@ void func_configuracion()
                             pc.printf("Ingrese coeficiente K para la entrada %d \n\r", i+1);
                             pc.scanf("%f",&aux2);
                             K_conf[i] = aux2;
-                            pc.printf("%f\n\r", aux2);
+                            pc.printf("%.1f\n\r", K_conf[i]);
                         }
 
 
@@ -528,23 +459,14 @@ void func_configuracion()
                         
                         if(dot->writeUserFile(nombre_file, &K_conf, sizeof(K_conf))<0 || flag_error_write<0) //se guarda en la memoria no volatil
                             error_1(Led_Red); //Enciende Led Rojo intermitente si falla la escritura
+                        //break;
+
+                        //Agrego las siguientes lineas para printear. 
+                        dot->seekUserFile(nombre_file, sizeof(int)*13, 0);
+                        dot->readUserFile(nombre_file, &K, sizeof(K));
+                        pc.printf("%.1f_%.1f_%.1f_%.1f_%.1f_%.1f_%.1f_%.1f", K[0], K[1], K[2], K[3], K[4], K[5], K[6], K[7]);
                         break;
 
-                //case 7:
-                        //Envio de configuracion AppKey y DevKey
-                //        int k;
-                //        for(k=0;k<16; k++)
-                //        {
-                //            pc.printf("%X", network_key[k]);
-                //        }
-                //        pc.printf("_");
-
-                //        for(k=0;k<8; k++)
-                //        {
-                //            pc.printf("%X", network_id[k]);
-                //        }
-                                 
-                //        break;
             }
         }
 
@@ -560,7 +482,7 @@ bool func_leer_config(void)
 
     dot->seekUserFile(nombre_file, 0, 0); // Me posiciono al principio del archivo
     flag_leer = dot->readUserFile(nombre_file, &CONFIGURACION, sizeof(CONFIGURACION));
-    dot->seekUserFile(nombre_file, sizeof(int)*12, 0);// Me posiciono donde termina CONFIGURACION, que sólo mostrará hasta los modos, no los K
+    dot->seekUserFile(nombre_file, sizeof(int)*13, 0);// Me posiciono donde termina CONFIGURACION, que sólo mostrará hasta los modos, no los K
     if(dot->readUserFile(nombre_file, &K, sizeof(K))<0 || flag_leer<0)//leo todo
     {
         logInfo("ERROR: no se pudo leer la configuracion\n\r");
@@ -570,9 +492,7 @@ bool func_leer_config(void)
 
         // Si se leyo correctamente analizo los datos
         TIEMPO_SLEEP = CONFIGURACION[0];
-        //unidad_TIEMPO_SLEEP=CONFIGURACION[1];
         cantidad_REINTENTOS = CONFIGURACION[1];
-        //TIEMPO_REINTENTOS_CONSECUTIVOS=CONFIGURACION[3];
         TIEMPO_RANDOM_SUP = CONFIGURACION[2];
         TIEMPO_RANDOM_INF = CONFIGURACION[3];
         frecSeleccionada = CONFIGURACION[4];
@@ -584,15 +504,20 @@ bool func_leer_config(void)
         modo_AI[5] = CONFIGURACION[10];
         modo_AI[6] = CONFIGURACION[11];
         modo_AI[7] = CONFIGURACION[12];
-
+        
 
         logInfo("TIEMPO_SLEEP = %d\n\r", TIEMPO_SLEEP); //Este en realidad es el tiempo entre envios
-        //logInfo("unidad_TIEMPO_SLEEP = %d\n\r", unidad_TIEMPO_SLEEP);
         logInfo("cantidad_REINTENTOS = %d\n\r", cantidad_REINTENTOS);
-        //logInfo("TIEMPO_REINTENTOS_CONSECUTIVOS = %d\n\r",  TIEMPO_REINTENTOS_CONSECUTIVOS);
         logInfo("TIEMPO_RANDOM_SUP = %d\n\r",  TIEMPO_RANDOM_SUP);
         logInfo("TIEMPO_RANDOM_INF = %d\n\r",  TIEMPO_RANDOM_INF);
-
+        logInfo("K1 = %.1f\n\r", K[0]);
+        logInfo("K2 = %.1f\n\r", K[1]);
+        logInfo("K3 = %.1f\n\r", K[2]);
+        logInfo("K4 = %.1f\n\r", K[3]);
+        logInfo("K5 = %.1f\n\r", K[4]);
+        logInfo("K6 = %.1f\n\r", K[5]);
+        logInfo("K7 = %.1f\n\r", K[6]);
+        logInfo("K8 = %.1f\n\r", K[7]);
         
         if(cantidad_REINTENTOS==0)
         {
@@ -740,17 +665,18 @@ void interruptPanel_rise(void)
 
     MBED_ASSERT(dot);
 
-    nombre_file = dot->openUserFile("ArchivoConfig.txt", (1 << 3)|(1 << 4)); // Crea un archivo y setea los bit 3 y 4 en 1.
+    nombre_file = dot->openUserFile("ArchivoConfig3.txt", (1 << 3)|(1 << 4)); // Crea un archivo y setea los bit 3 y 4 en 1.
 
     if(!dot->seekUserFile(nombre_file, 0, 0))// Si es la primera vez que entre al if y cree el archivo
     {
-        dot->saveUserFile("ArchivoConfig.txt", CONFIGURACION, sizeof(CONFIGURACION) + sizeof(float)*2);
-        nombre_file = dot->openUserFile("ArchivoConfig.txt", (1 << 3)|(1 << 4));
+        dot->saveUserFile("ArchivoConfig3.txt", CONFIGURACION, sizeof(CONFIGURACION) + sizeof(float)*4);
+        nombre_file = dot->openUserFile("ArchivoConfig3.txt", (1 << 3)|(1 << 4));
     }
         
     //pc.printf("Ingrese 1 para cargar conf: \n\r"); // Hay que eliminar esta parte
     //pc.scanf("%d\n\r", &test); // Hay que eliminar esta parte, sólo es para prueba
 
+    //if(test == 1)
     if(DI_Config)   
     {
         // Configuracion

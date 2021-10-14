@@ -1105,7 +1105,7 @@ U 1 1 6122ADE0
 P 9700 2300
 F 0 "Dreg1" V 9654 2380 50  0000 L CNN
 F 1 "D_Zener" V 9745 2380 50  0000 L CNN
-F 2 "Diode_THT:D_A-405_P12.70mm_Horizontal" H 9700 2300 50  0001 C CNN
+F 2 "Diode_THT:D_DO-15_P15.24mm_Horizontal" H 9700 2300 50  0001 C CNN
 F 3 "~" H 9700 2300 50  0001 C CNN
 	1    9700 2300
 	0    1    1    0   
@@ -1252,7 +1252,7 @@ U 1 1 6132CA14
 P 10000 5300
 F 0 "Dreg2" V 9954 5380 50  0000 L CNN
 F 1 "D_Zener" V 10045 5380 50  0000 L CNN
-F 2 "Diode_THT:D_A-405_P12.70mm_Horizontal" H 10000 5300 50  0001 C CNN
+F 2 "Diode_THT:D_DO-15_P15.24mm_Horizontal" H 10000 5300 50  0001 C CNN
 F 3 "~" H 10000 5300 50  0001 C CNN
 	1    10000 5300
 	0    1    1    0   
@@ -1978,4 +1978,20 @@ Wire Wire Line
 	13650 10050 15150 10050
 NoConn ~ 14750 8700
 NoConn ~ 14750 8800
+Text GLabel 4950 8150 1    50   Input ~ 0
+3VMdot
+Text GLabel 2550 8150 1    50   Input ~ 0
+3VMdot
+Text GLabel 2550 5750 1    50   Input ~ 0
+3VMdot
+Text GLabel 4950 5750 1    50   Input ~ 0
+3VMdot
+Text GLabel 2550 3400 1    50   Input ~ 0
+3VMdot
+Text GLabel 4950 3400 1    50   Input ~ 0
+3VMdot
+Text GLabel 2550 1000 1    50   Input ~ 0
+3VMdot
+Text GLabel 4950 1000 1    50   Input ~ 0
+3VMdot
 $EndSCHEMATC

@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source "C:\\Users\\luis Quiroga\\Desktop\\Facu\\Proyecto\\Software\\PCBs\\Test1\\Test1.sch")
-    (date "27/08/2021 15:12:49")
+    (date "14/10/2021 15:24:57")
     (tool "Eeschema (5.1.10)-1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -321,7 +321,7 @@
       (tstamp 612024C0))
     (comp (ref Dreg1)
       (value D_Zener)
-      (footprint Diode_THT:D_A-405_P12.70mm_Horizontal)
+      (footprint Diode_THT:D_DO-15_P15.24mm_Horizontal)
       (datasheet ~)
       (libsource (lib Device) (part D_Zener) (description "Zener diode"))
       (sheetpath (names /) (tstamps /))
@@ -370,7 +370,7 @@
       (tstamp 612FD61A))
     (comp (ref Dreg2)
       (value D_Zener)
-      (footprint Diode_THT:D_A-405_P12.70mm_Horizontal)
+      (footprint Diode_THT:D_DO-15_P15.24mm_Horizontal)
       (datasheet ~)
       (libsource (lib Device) (part D_Zener) (description "Zener diode"))
       (sheetpath (names /) (tstamps /))
