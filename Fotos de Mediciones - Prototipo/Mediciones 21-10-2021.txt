@@ -1,0 +1,21 @@
+Segun Multímetro: Tensión de alimentación total 9.41V
+Segun Multimetro: Tensión de entrada al circuito luego de la resistencia 9.39V
+Según multímetro: Caida sobre la resistencia 0.026V
+
+Frecuencia de 1kHz, 100Hz, 500Hz
+Tensión pico de entrada 1Vp
+
+Osciloscopio:
+Tensión de alimentación total 9.76V
+Tensión de entrada al circuito luego de la resistencia 9.50V
+Caída sobre la resistencia....medida con multímetro.
+Tensión cuando se levanta y calcula: 9.39V
+Tiempo cuando está calculando 1(kHz): 7 segundos
+
+Tensión cuando envía los paquetes de info: 9.46V
+Tiempo total de envío de paquetes de info de todos los paquetes: 3.28 seg 
+
+Tensión cuando inicia e intenta enlazarse: 9.04V
+Tiempo cuando está enviando el dato Tx: 1.32 segundos
+Tiempo cuando abre ventana Rx, luego de Tx y espera:  
+Tiempo de enlace cuando inicia: 

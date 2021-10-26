@@ -1,0 +1,16 @@
+Se realizaron mediciones del prototipo para analizar el consumo del mismo en diferentes casos. Se tomó el peor caso, por ej, que es cuando recién se inicia el
+mdot que trata de hacer el join con la network y no tiene ni idea de la potencia de transmisión ni nada por el estilo, es por eso que lo hace a máxima
+potencia primero y luego con el adaptive rate se acomoda y fija un tiempo de envío, y por lo tanto un consumo, una potencia de envío.
+Se midió con una resistencia de 3.6Ohms en la entrada de bateria y se midió a partir de allí todo aguas abajo. Basicamente se tomó en estado estacionario
+a una frecuencia de 1kHz y 1Vp para el estado de todas las entradas habilitadas pero ingresando por 1 sola entrada física de señal y luego con todas
+deshabilitadas menos 1 que es por donde también ingresa dicha señal. Para este último caso se midió para distintas frecuencias y varió notablemente el
+tiempo de cálculo de la lógica ya que al estar deshabilitada no lee esas entradas y se ahorra tiempo. Por otra parte se tomó con todas habilitadas y con
+una sola entrada física, lo que hace que el tiempo de cálculo de la lógica sea alto ya que en realidad no cuenta los 40 ciclos sino que se queda 1 seg
+aproximadamente en cada entrada y el tiempo de cálculo de la entrada que sí tiene señal queda despreciable respecto al total.
+Medí tiempos y tensiones para luego calcular las corrientes.
+
+Mañana voy a a medir qué sucede cuando despego lo que sería el panel, es decir, simulo que se cortó el panel. Esperaría ver que no hay corriente entrando
+al pin digital ese ya que la resistencia de 10k de pull down no tiene caída. Debería ver una disminuición en la caída de tensión de la resistencia de 3.6
+de la entrada.
+
+Una vez que finalice con esto y vea que todo es coherente puedo dar por finalizada la validación del prototipo.

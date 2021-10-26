@@ -856,7 +856,7 @@ void interruptPanel_rise(void)
                     tx_data3.push_back(0xBB);// Primer Frame
                     tx_data3.push_back(0x02);// Dato auxiliar, podria ser el nivel de campo, tension, alarma, etc
                     tx_data3.push_back(cortePanel); //Meto dato de cómo se encuentra el estado de panel
-                    send_data(tx_data3); //Esta línea quizás sea mejor ponerla en la condición del OR mas adelante
+                    //send_data(tx_data3); //Esta línea quizás sea mejor ponerla en la condición del OR mas adelante
 
                     //Para los 8 AI
                     for(k=0;k<cantidad_AI; k++)
