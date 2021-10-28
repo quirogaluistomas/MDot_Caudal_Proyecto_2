@@ -1,0 +1,7 @@
+Se realizó la prueba del consumo con y sin la resistencia de pull down del panel y no varió practicamente el consumo.
+Hay que revisar bien el consumo que le dio a Gabi en su momento con el mdot y los integrados THT. La medición mia dió del orden de los 8mA en modo
+sleep...este consumo se debe a los reguladores 2940 y 317 y a una posible caída en las resistencias de regulación del 317.
+
+Por otra parte, se observó que hay que analizar bien el tema del adaptive rate puesto que el consumo fue bajando a medida que pasa el tiempo..
+al ppio emite a max potencia, luego disminuye el duty cycle disminuyendo así el consumo pero no varía la amplitud y luego baja la amplitud a la mitad, 
+unos 200mV de caída sobre la resistencia, a diferencia de antes que enviaba a 400mV.
