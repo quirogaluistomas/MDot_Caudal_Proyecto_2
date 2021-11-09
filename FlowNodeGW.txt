@@ -1,0 +1,441 @@
+[
+    {
+        "id": "5df6dc12.cb3a24",
+        "type": "tab",
+        "label": "Lucho Test"
+    },
+    {
+        "id": "b7bfa23e.c1f7b",
+        "type": "lora in",
+        "z": "5df6dc12.cb3a24",
+        "name": "Datos",
+        "datatype": "bytes",
+        "x": 162.5,
+        "y": 859.25,
+        "wires": [
+            [
+                "aa34d0d6.1335",
+                "7755a66b.c85418"
+            ]
+        ]
+    },
+    {
+        "id": "7755a66b.c85418",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "Filtrado de Nodos",
+        "func": "var Payload=msg.payload;\nvar RSSI, SNR, tiempo ,deveui;\n\n\nvar Nodo_tipo= (Payload[0]*65536) + (Payload[1]*256)+ Payload[2];\n//var frame= Payload.substr(4,2);\n\nswitch(Nodo_tipo){\n    \n    case 11188992://AABB00 Nodo Caudal DMZ primer msg\n         msg.nodo=1;\n         msg.payload= {dato:Payload,\n                      deveui:msg.deveui,\n                      tiempo:msg.time,\n                      RSSI:msg.rssi,\n                      SNR:msg.lsnr};\n        break;\n    case 11188993://AABB01 Nodo Caudal DMZ segundo msg\n         msg.nodo=2;\n         msg.payload= {dato:Payload,\n                      deveui:msg.deveui,\n                      tiempo:msg.time,\n                      RSSI:msg.rssi,\n                      SNR:msg.lsnr};\n        break;\n    case 11188994://AABB02 Nodo Caudal DMZ tercer msg\n         msg.nodo=3;\n         msg.payload= {dato:Payload,\n                      deveui:msg.deveui,\n                      tiempo:msg.time,\n                      RSSI:msg.rssi,\n                      SNR:msg.lsnr};\n        break;\n    default:\n        msg.nodo=4; //Otros Nodos \n        msg.payload= {dato:Payload,\n                      deveui:msg.deveui,\n                      tiempo:msg.time,\n                      RSSI:msg.rssi,\n                      SNR:msg.lsnr};\n        break;\n}\n\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 481.50006103515625,
+        "y": 853.7500257492065,
+        "wires": [
+            [
+                "ee1515e7.d622e8"
+            ]
+        ]
+    },
+    {
+        "id": "aa34d0d6.1335",
+        "type": "debug",
+        "z": "5df6dc12.cb3a24",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "true",
+        "x": 407.11669921875,
+        "y": 727.25,
+        "wires": []
+    },
+    {
+        "id": "ee1515e7.d622e8",
+        "type": "switch",
+        "z": "5df6dc12.cb3a24",
+        "name": "Switch_nodo",
+        "property": "nodo",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "2",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "3",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "4",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 4,
+        "x": 809,
+        "y": 854,
+        "wires": [
+            [
+                "554a6df9.812cd4"
+            ],
+            [
+                "ddb966cd.eecd68"
+            ],
+            [
+                "46edc59c.f627fc"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "554a6df9.812cd4",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "CAUDAL_DMZ AI1-4",
+        "func": "var deveui, datoDecimal, topico, NivelCampo, SNR, DevEui, timestamp;\n\nSNR = msg.payload.SNR; //SNR del paquete\nNivelCampo = msg.payload.RSSI; //RSSI del paquete\nDevEui = msg.payload.deveui; //DevEui del nodo\ntimestamp = msg.payload.tiempo; //Estampa de tiempo\n\ndatoDecimal = msg.payload.dato; //Se toma el vector de datos crudo en decimal\n\ntopico = \"LoRa/Caudal_Lucho/\"+ DevEui; //Se crea el topico\n\ndato = decopulsos(datoDecimal); //Vector de valores medidos\n\nvar msg1 = { payload:dato[0], topic:topico };//AI1\nvar msg2 = { payload:dato[1], topic:topico };//AI2\nvar msg3 = { payload:dato[2], topic:topico };//AI3\nvar msg4 = { payload:dato[3], topic:topico };//AI4\nvar msg5 = { payload:timestamp, topic:topico };\nvar msg6 = { payload:DevEui, topic:topico };\nvar msg7 = { payload:NivelCampo, topic:topico };\nvar msg8 = { payload:SNR, topic:topico };\n\n\nreturn [msg1,msg2,msg3,msg4,msg5,msg6,msg7,msg8];\n\nfunction decopulsos(dato) {\n  AI_1 = dato[3]*256 + dato[4];\n  AI_2 = dato[5]*256 + dato[6];\n  AI_3 = dato[7]*256 + dato[8];\n  AI_4 = dato[9]*256 + dato[10];\n  return [AI_1,AI_2,AI_3,AI_4];\n}",
+        "outputs": 8,
+        "noerr": 0,
+        "x": 1179,
+        "y": 667,
+        "wires": [
+            [
+                "37c36559.f753fa"
+            ],
+            [
+                "a4421b8e.f117f8"
+            ],
+            [
+                "1663fe4.de16502"
+            ],
+            [
+                "54cbe24c.76283c"
+            ],
+            [
+                "62b3dd8f.cca304"
+            ],
+            [
+                "3f745aba.039de6"
+            ],
+            [
+                "7c2e7644.5790b8"
+            ],
+            [
+                "cfbb4719.f2d958"
+            ]
+        ]
+    },
+    {
+        "id": "ddb966cd.eecd68",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "CAUDAL_DMZ AI5-8",
+        "func": "var DevEui, datoDecimal, topico;\n\n\ndatoDecimal = msg.payload.dato; //Se toma el vector de datos crudo en decimal\n\nDevEui = msg.payload.deveui; // DevEUI del nodo\n\ntopico = \"LoRa/Caudal_Lucho/\"+ DevEui; //Se crea tópico\n\ndato = decopulsos(datoDecimal); //Vector de datos medidos\n\nvar msg1 = { payload:dato[0], topic:topico }; //AI5\nvar msg2 = { payload:dato[1], topic:topico }; //AI6\nvar msg3 = { payload:dato[2], topic:topico }; //AI7\nvar msg4 = { payload:dato[3], topic:topico }; //AI8\n\n\n\nreturn [msg1,msg2,msg3,msg4];\n\nfunction decopulsos(dato) {\n  AI_5 = dato[3]*256 + dato[4];\n  AI_6 = dato[5]*256 + dato[6];\n  AI_7 = dato[7]*256 + dato[8];\n  AI_8 = dato[9]*256 + dato[10];\n  return [AI_5,AI_6,AI_7,AI_8];\n}",
+        "outputs": 4,
+        "noerr": 0,
+        "x": 1181,
+        "y": 909,
+        "wires": [
+            [
+                "1ead7d5b.517e73"
+            ],
+            [
+                "279b88d1.52eb08"
+            ],
+            [
+                "c4973764.4994a8"
+            ],
+            [
+                "510b9100.ea7c"
+            ]
+        ]
+    },
+    {
+        "id": "46edc59c.f627fc",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "CAUDAL_DMZ DI",
+        "func": "var DevEui, datoDecimal, topico;\n\n\ndatoDecimal = msg.payload.dato;\n\nDevEui = msg.payload.deveui;\n\ntopico = \"LoRa/Caudal_Lucho/\"+ DevEui;\n\ndato = decopulsos(datoDecimal);\n\nvar msg1 = { payload:dato[0], topic:topico }; //Estado digital\n\n\nreturn msg1;\n\nfunction decopulsos(dato) {\n  DI_1 = dato[3]*256 + dato[4];\n  return DI_1;\n}",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1184,
+        "y": 1078,
+        "wires": [
+            [
+                "ae4c7e9a.d314b"
+            ]
+        ]
+    },
+    {
+        "id": "37c36559.f753fa",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "AI1_CAUDAL",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/Frecuencia_Caudal_1\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1534,
+        "y": 506,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "54cbe24c.76283c",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "AI4_CAUDAL",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/Frecuencia_Caudal_4\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1534,
+        "y": 626,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "a4421b8e.f117f8",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "AI2_CAUDAL",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/Frecuencia_Caudal_2\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1534,
+        "y": 546,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "1663fe4.de16502",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "AI3_CAUDAL",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/Frecuencia_Caudal_3\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1534,
+        "y": 586,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "62b3dd8f.cca304",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "Estampa_Tiempo",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/Estampa_Tiempo\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1544,
+        "y": 666,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "3f745aba.039de6",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "Direccion del Nodo",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/Direccion_Nodo\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1545,
+        "y": 710,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "7c2e7644.5790b8",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "RSSI",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/Intensidad_Señal\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1506,
+        "y": 750,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "cfbb4719.f2d958",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "SNR",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/SNR\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1506,
+        "y": 789,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "1ead7d5b.517e73",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "AI5_CAUDAL",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/Frecuencia_Caudal_5\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1536,
+        "y": 850,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "510b9100.ea7c",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "AI8_CAUDAL",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/Frecuencia_Caudal_8\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1535,
+        "y": 972,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "279b88d1.52eb08",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "AI6_CAUDAL",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/Frecuencia_Caudal_6\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1535,
+        "y": 892,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "c4973764.4994a8",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "AI7_CAUDAL",
+        "func": "//Modifico topic\nmsg.topic= msg.topic + \"/Frecuencia_Caudal_7\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1535,
+        "y": 932,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "ae4c7e9a.d314b",
+        "type": "function",
+        "z": "5df6dc12.cb3a24",
+        "name": "DI1",
+        "func": "//Modifico topic sumandole el propio del estado digital\n\nmsg.topic= msg.topic + \"/DI1\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1504,
+        "y": 1080,
+        "wires": [
+            [
+                "1799038a.4bc05c"
+            ]
+        ]
+    },
+    {
+        "id": "1799038a.4bc05c",
+        "type": "mqtt out",
+        "z": "5df6dc12.cb3a24",
+        "name": "Publicacion MQTT",
+        "topic": "",
+        "qos": "",
+        "retain": "true",
+        "broker": "b42af0cd.fec22",
+        "x": 2097,
+        "y": 682,
+        "wires": []
+    },
+    {
+        "id": "8b6df1c3.95904",
+        "type": "debug",
+        "z": "5df6dc12.cb3a24",
+        "name": "Dato Publicado",
+        "active": true,
+        "console": "false",
+        "complete": "true",
+        "x": 1801,
+        "y": 1349,
+        "wires": []
+    },
+    {
+        "id": "5b89533.9299aac",
+        "type": "mqtt in",
+        "z": "5df6dc12.cb3a24",
+        "name": "Subscripcion",
+        "topic": "LoRa/Caudal_Lucho/#",
+        "qos": "2",
+        "broker": "b42af0cd.fec22",
+        "x": 892.9833984375,
+        "y": 1345.6665649414062,
+        "wires": [
+            [
+                "8b6df1c3.95904"
+            ]
+        ]
+    },
+    {
+        "id": "b42af0cd.fec22",
+        "type": "mqtt-broker",
+        "z": "",
+        "broker": "10.0.3.90",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    }
+]

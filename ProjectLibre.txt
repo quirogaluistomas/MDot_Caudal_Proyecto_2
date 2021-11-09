@@ -1,0 +1,117 @@
+Tareas
+
+Investigación:
+
+Productos similares o posible competencia
+Factibilidad técnica.
+Protocolos de comunicación.
+Protocolos IoT.
+Recopilación de información de proceso y lugar. 
+Cálculos de enlace.
+Regulaciones.
+Entorno de desarrollo.
+
+
+Planificación:
+
+Estudio de Mercado.
+Establecimiento de requerimientos.
+Casa de Calidad.
+Grupo de trabajo y tareas.
+Factibilidad Económica/Análisis de Rentabilidad
+
+
+Ingeniería
+
+Diseño de Software.
+Diseño de Hardware.
+Esquemático.
+Ingeniería de detalle.
+Especificaciones técnicas.
+Listado de Materiales.
+Desarrollo de protocolo de pruebas.
+Pruebas básicas en protoboard.
+Diseño de PCB.
+Diseño de Montaje.
+Plano Topográfico.
+
+Compras
+
+Circuito Impreso Prototipo.
+Circuito Impreso Diseño Final.
+Componentes Nacionales.
+Componentes Importados.
+Gabinete.
+Panel Solar.
+Batería.
+Antena.
+Cables para antena.
+
+Programación
+
+Adquisición de entradas.
+Comunicación.
+Configuración de GW. (Si se vende el GW tanto mejor)
+Tratamiendo de los datos con NodeRed.
+Historización en base de datos InfluxdB.
+Visualización en Grafana.
+Configuración de servidores locales.
+
+
+
+Construcción
+
+Soldado de placa prototipo.
+Soldado de placa diseño definitivo.
+Construcción de Gabinete con Panel y Antena.
+
+
+Ensayos
+
+Eléctricos/Electrónicos.
+Configuración de programa.
+Comunicación.
+Software.
+
+
+Pruebas de funcionamiento de prototipo.
+
+Mediciones.
+Validación de prototipo.
+Historicos de datos.
+Visualización.
+
+
+TESTING FINAL
+Validación del sistema final
+
+
+Documentación
+
+Manual de Usuario
+Guía rápida.
+Plano Topográfico y de Conexionado.
+
+
+
+
+
+A todo esto se le sumarán más días de los recomendados puesto que hubo pandemia y se dedicó tiempo a otras prioridades.
+
+
+
+Manejo del Soft ProjectLibre
+
+Primero de todo crear proyecto
+Setear los dias y los horarios laborables en "Calendario", para ello crear una copia del calendario estandar.
+En "Información" se debe setear el calendario base con el que yo creé.
+Lo guardo.
+
+Luego hay que realizar el WBS o EDT (Estructura de distribución de tareas) que es lo que ya hice arriba pero ahora hay que asignar
+un tiempo a dichas tareas.
+Si tengo subtareas dentro de una tarea puedo agarrarlas con shift y luego ponerle "tarea-->sangrar" y me las coloca dentro de esa
+tarea general.
+Una vez que le ponemos los dias de cada tarea tenemos que decir cuál precede a cual para poder ir armando el diagrama de gantt
+Hay unos comandos para poder ir acomodando las tareas, como por ejemplo, FS (Final Start) y sumar o restar dias para que comience después
+o antes de lo previsto respectivamente, SS(Start-Start) para comenzar juntas las tareas y también se puede sumar o restar días para que
+comience después o antes. Por último está FF (Finish-Finish) que indica cuando termina la tarea.

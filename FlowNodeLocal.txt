@@ -1,0 +1,1014 @@
+[
+    {
+        "id": "d4090b74.2901b8",
+        "type": "tab",
+        "label": "Flow 11",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "37cdf369.b02b4c",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "SNR",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 860,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "d1af23aa.a3e16",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/SNR",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 230,
+        "y": 200,
+        "wires": [
+            [
+                "bbf3a4cf.c01c48",
+                "d22f8751.f28f18"
+            ]
+        ]
+    },
+    {
+        "id": "bbf3a4cf.c01c48",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "d22f8751.f28f18",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var snr = parseFloat(msg.payload);\n\nmsg.payload = {\n    SNR: snr,\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 200,
+        "wires": [
+            [
+                "37cdf369.b02b4c",
+                "3d1bc6e0.cf930a"
+            ]
+        ]
+    },
+    {
+        "id": "c5c1c484.d740c8",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "AI_1",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 860,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "cf0f1f99.72d89",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/Frecuencia_Caudal_1",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 280,
+        "y": 300,
+        "wires": [
+            [
+                "b3629d73.a523d",
+                "53ab1b6e.225c04"
+            ]
+        ]
+    },
+    {
+        "id": "b3629d73.a523d",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var AI = parseFloat(msg.payload);\n\nmsg.payload = {\n    AI_1: AI,\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 300,
+        "wires": [
+            [
+                "c5c1c484.d740c8",
+                "6a4cd9b4.8ca668"
+            ]
+        ]
+    },
+    {
+        "id": "2e594026.5ae79",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "AI_2",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 860,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "ee973cb9.29445",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/Frecuencia_Caudal_2",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 280,
+        "y": 380,
+        "wires": [
+            [
+                "bfb406ff.348068",
+                "516a2f1d.28306"
+            ]
+        ]
+    },
+    {
+        "id": "bfb406ff.348068",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var AI = parseFloat(msg.payload);\n\nmsg.payload = {\n    AI_2: AI,\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 380,
+        "wires": [
+            [
+                "2e594026.5ae79",
+                "27516ead.e5dd32"
+            ]
+        ]
+    },
+    {
+        "id": "8031f61e.019b08",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "AI_3",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 860,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "9b02a3c1.0a748",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/Frecuencia_Caudal_3",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 280,
+        "y": 460,
+        "wires": [
+            [
+                "d7e10999.ccc2e8",
+                "5e33f14f.e85d5"
+            ]
+        ]
+    },
+    {
+        "id": "d7e10999.ccc2e8",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var AI = parseFloat(msg.payload);\n\nmsg.payload = {\n    AI_3: AI,\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 460,
+        "wires": [
+            [
+                "8031f61e.019b08",
+                "e531565c.0946c8"
+            ]
+        ]
+    },
+    {
+        "id": "ad92fc61.a3e3f",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "AI_4",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 860,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "35569fa5.08c9e",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/Frecuencia_Caudal_4",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 280,
+        "y": 540,
+        "wires": [
+            [
+                "6ce3bde8.e240c4",
+                "bfecfe92.8b507"
+            ]
+        ]
+    },
+    {
+        "id": "6ce3bde8.e240c4",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var AI = parseFloat(msg.payload);\n\nmsg.payload = {\n    AI_4: AI,\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 540,
+        "wires": [
+            [
+                "ad92fc61.a3e3f",
+                "c4de1799.18c978"
+            ]
+        ]
+    },
+    {
+        "id": "7a6c9848.38c0f8",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "AI_5",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 860,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "738944ca.994b2c",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/Frecuencia_Caudal_5",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 280,
+        "y": 620,
+        "wires": [
+            [
+                "79ee54e0.9d2aac",
+                "bddf2c46.34fa6"
+            ]
+        ]
+    },
+    {
+        "id": "79ee54e0.9d2aac",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var AI = parseFloat(msg.payload);\n\nmsg.payload = {\n    AI_5: AI,\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 620,
+        "wires": [
+            [
+                "7a6c9848.38c0f8",
+                "c181988.9de4c68"
+            ]
+        ]
+    },
+    {
+        "id": "3de7035e.84470c",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "AI_6",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 860,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "84ee2ce6.3074a",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/Frecuencia_Caudal_6",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 280,
+        "y": 700,
+        "wires": [
+            [
+                "7661979f.5b6768",
+                "8c7f8c23.47bef"
+            ]
+        ]
+    },
+    {
+        "id": "7661979f.5b6768",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var AI = parseFloat(msg.payload);\n\nmsg.payload = {\n    AI_6: AI,\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 700,
+        "wires": [
+            [
+                "3de7035e.84470c",
+                "cb64599d.11dfd8"
+            ]
+        ]
+    },
+    {
+        "id": "3e59460c.c9e85a",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "AI_7",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 860,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "75fca60b.bc6dd8",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/Frecuencia_Caudal_7",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 280,
+        "y": 780,
+        "wires": [
+            [
+                "1179f6b6.a6ecf9",
+                "f20f5f87.6dbec"
+            ]
+        ]
+    },
+    {
+        "id": "1179f6b6.a6ecf9",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var AI = parseFloat(msg.payload);\n\nmsg.payload = {\n    AI_7: AI,\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 780,
+        "wires": [
+            [
+                "3e59460c.c9e85a",
+                "a359bcb.1c0d04"
+            ]
+        ]
+    },
+    {
+        "id": "6043e40a.2cc9fc",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "AI_8",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 860,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "cd50ad79.07bdd",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/Frecuencia_Caudal_8",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 280,
+        "y": 860,
+        "wires": [
+            [
+                "3720f935.30acf6",
+                "d7f463ea.bf005"
+            ]
+        ]
+    },
+    {
+        "id": "3720f935.30acf6",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var AI = parseFloat(msg.payload);\n\nmsg.payload = {\n    AI_8: AI,\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 860,
+        "wires": [
+            [
+                "6043e40a.2cc9fc",
+                "f3f62ce.2560ad"
+            ]
+        ]
+    },
+    {
+        "id": "b0dcbe2b.0d1c7",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "RSSI",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 870,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "6ac6d137.dae86",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/Intensidad_Señal",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 270,
+        "y": 940,
+        "wires": [
+            [
+                "52271bf.6bc4ee4",
+                "f51d8af4.14a268"
+            ]
+        ]
+    },
+    {
+        "id": "52271bf.6bc4ee4",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var rssi = parseFloat(msg.payload);\n\nmsg.payload = {\n    RSSI: rssi,\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 940,
+        "wires": [
+            [
+                "b0dcbe2b.0d1c7",
+                "ba55fe67.d901f"
+            ]
+        ]
+    },
+    {
+        "id": "53ab1b6e.225c04",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "516a2f1d.28306",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "5e33f14f.e85d5",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "bfecfe92.8b507",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "bddf2c46.34fa6",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "8c7f8c23.47bef",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "f20f5f87.6dbec",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "d7f463ea.bf005",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "f51d8af4.14a268",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "f362feb0.9386a",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "NodeAddress",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 890,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "d359c52e.f72838",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/Direccion_Nodo",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 270,
+        "y": 1020,
+        "wires": [
+            [
+                "a0fe0b01.e94358",
+                "627de224.51adfc"
+            ]
+        ]
+    },
+    {
+        "id": "a0fe0b01.e94358",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var ad = msg.payload;\n\nmsg.payload = {\n    Address: ad,\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 1020,
+        "wires": [
+            [
+                "f362feb0.9386a"
+            ]
+        ]
+    },
+    {
+        "id": "627de224.51adfc",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "aa8cfb8f.17bb98",
+        "type": "influxdb out",
+        "z": "d4090b74.2901b8",
+        "influxdb": "8dfb3786.9ad808",
+        "name": "",
+        "measurement": "TimeStamp",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 880,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "e27f41f6.b0263",
+        "type": "mqtt in",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "topic": "LoRa/Caudal_Lucho/00-80-00-00-00-01-de-35/Estampa_Tiempo",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "66dfdb12.eb8134",
+        "x": 270,
+        "y": 1100,
+        "wires": [
+            [
+                "12b0ceb5.73f041",
+                "baf76494.b62ff8"
+            ]
+        ]
+    },
+    {
+        "id": "12b0ceb5.73f041",
+        "type": "function",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "func": "var timeStamp = msg.payload;\n\nmsg.payload = {\n    TimeStamp: timeStamp,\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 640,
+        "y": 1100,
+        "wires": [
+            [
+                "aa8cfb8f.17bb98"
+            ]
+        ]
+    },
+    {
+        "id": "baf76494.b62ff8",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "ba55fe67.d901f",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "f3f62ce.2560ad",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "a359bcb.1c0d04",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "cb64599d.11dfd8",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "c181988.9de4c68",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "c4de1799.18c978",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "e531565c.0946c8",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "27516ead.e5dd32",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "6a4cd9b4.8ca668",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "3d1bc6e0.cf930a",
+        "type": "debug",
+        "z": "d4090b74.2901b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "8dfb3786.9ad808",
+        "type": "influxdb",
+        "z": "",
+        "hostname": "127.0.0.1",
+        "port": "8086",
+        "protocol": "http",
+        "database": "testLora",
+        "name": "",
+        "usetls": false,
+        "tls": ""
+    },
+    {
+        "id": "66dfdb12.eb8134",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "",
+        "broker": "10.0.3.90",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]
