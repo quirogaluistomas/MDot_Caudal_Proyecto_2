@@ -1,0 +1,25 @@
+Tomar en cuenta aguinaldo y aportes + impuestos de alrededor de X %
+
+No me meto con sectores ajenos al proyecto.
+
+Asignando recursos en el gannt sale la cantidad de horas de mano de obra.
+
+
+Salario bruto =  1.17* Salario Neto
+
+Salario para la empresa = Salario bruto * 1.23   (Costo indirecto)
+
+Para el costo de hora se toman 20 dias hábiles de 8 horas.
+
+
+
+Para la asignación de recursos de las tareas vos lo que sabes es la cantidad de horas que te va a tomar y le asignas un porcentaje del día a esa tarea
+luego el soft solito te calcula la cantidad de dias que a vos te tomaría dicha tarea. Es decir, yo puedo ajustar la cantidad de dias al porcentaje de
+tiempo que le dedico al día a dicha tarea. Ej: Si dedico el 50%, es decir 4 hs, puedo decir entonces que la tarea me duraría 10 días, es decir 40hs.
+
+Ahora bien, el problema viene cuando hay que asignar la tarea a distintas personas puesto que si hacen 50% cada uno entonces lo realizan paralelamente,
+con lo cual quedarían 20hs para c/u y terminarías en la mitad del tiempo ya que toma el valor original de 40hs y la divide en cantidad de horas por 
+persona según el porcentaje.
+
+
+
