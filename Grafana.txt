@@ -8,3 +8,7 @@ red puedan acceder al grafana poniendo mi ip y puerto.
 En "Configurations" --> "Data Sources" creo la tabla de datos y le indico de qué tipo será y a dónde se encuentra el servidor. Luego "Save and Apply"
 
 Luego para crear los dashboards inserto yo mismo la query a la dB para poder mostrar lo que a mi se me ocurra. Acá hay que jugar.
+
+
+Recordar que para crear alarma hay que poner la alerta del último valor y solo se puede realizar en gráficos de tendencia para colocar un umbral
+no en los de Status. Por otra parte se debe ir a gmail, cuenta y seguridad. Allí hay que darle permitir "acceso a aplicaciones no seguras".
