@@ -4,14 +4,12 @@
 // Se pueden setear los tiempos random superior e inferior, entre ciertos límites. TIEMPO_RANDOM_SUP y TIEMPO_RANDOM_INF
 
 // Se ingresa en modo confuguracion si se preciona S2 (boton incorporado en la placa) al alimentarlo
-// la configuracion se guarda en la memoria no volatil
-
-// Se incorporó los tiempo de reintento de enlace con el gateway (Tiempo_reintento_join y Tiempo_reintento_join_2)
+// la configuracion se guarda en la memoria flash
+// Se incorporó los tiempos de reintento de enlace con el gateway (Tiempo_reintento_join y Tiempo_reintento_join_2)
 // el Dot se considera desconectado despues de una cantidaad threshold_fallos de fallos en el envio de datos
 
 // NOTA 1: una vez que se toma la muestra se intenta enviarlo hasta 6 veces, si falla en los 6 intentos el dato se pierde.
 // NOTA 2: la funcion sleep_wake_rtc_only fue modificada para poder pasarle como parametro el tiempo de sleep
-// NOTA 3: la funcion printf solo debe usarse para enviarle datos a la aplicacion. Para mostrar por serie utilizar 
 
 #include "dot_util.h"
 #include "RadioEvent.h"
@@ -46,27 +44,16 @@ int cantidad_AI=8;
 
 //Creo arreglos para guardar las frecuencias de los canales leidos, el original en flotante y otro en entero para la resolución
 float frec_ch[8];
+
 int frec_ch_int[8];
 
 int flag_configuracion=0;
-//int TIEMPOS[5];
+
 
 int CONFIGURACION[13];
-//[0] TIEMPO_SLEEP;
-//[1] cantidad_REINTENTOS;
-//[2] TIEMPO_RANDOM_SUP;
-//[3] TIEMPO_RANDOM_INF;
-//[4] seleccion_frec;
-//[5] modo_AI[0];
-//[6] modo_AI[1];
-//[7] modo_AI[2];
-//[8] modo_AI[3];
-//[9] modo_AI[4];
-//[10] modo_AI[5];
-//[11] modo_AI[6];
-//[12] modo_AI[7];
 
-//float *K = new float[cantidad_AI]; // Toma las constantes de cada caudalímetro.
+
+// Toma las constantes de cada caudalímetro.
 float K[8]; // Toma las constantes de cada caudalímetro.
 
 int TIEMPO_SLEEP; //En realidad es el tiempo entre envíos, no el tiempo que está durmiendo
@@ -79,11 +66,11 @@ mDot::mdot_file nombre_file;
 int frecSeleccionada;
 
 //Se crea vector de estados de Analog Inputs
-//int *modo_AI = new int[cantidad_AI]; // 0: Deshabilitada 1: Habilitada
+// 0: Deshabilitada 1: Habilitada
 int modo_AI[8];// 0: Deshabilitada 1: Habilitada
 
-uint32_t Tiempo_reintento_join=360; // en seg no sé qué es
-uint32_t Tiempo_reintento_join_2=600; // en seg no sé qué es
+uint32_t Tiempo_reintento_join=360; // en seg
+uint32_t Tiempo_reintento_join_2=600; // en seg
 
 int cortePanel = 1; //Variable flag que indicará si se ha cortado la tensión de panel
 
@@ -105,11 +92,11 @@ static std::string network_name = "MultiTech";
 static std::string network_passphrase = "MultiTech";
 static uint8_t network_id[] = { 0x6C, 0x4E, 0xEF, 0x66, 0xF4, 0x79, 0x86, 0xA6 };
 static uint8_t network_key[] = { 0x1F, 0x33, 0xA1, 0x70, 0xA5, 0xF1, 0xFD, 0xA0, 0xAB, 0x69, 0x7A, 0xAE, 0x2B, 0x95, 0x91, 0x6B };
-static uint8_t frequency_sub_band = 1;
+static uint8_t frequency_sub_band = 1; // Selección de sub banda. Debe coincidir con la config del GW
 static lora::NetworkType network_type = lora::PUBLIC_LORAWAN;
-static uint8_t join_delay = 5;
+static uint8_t join_delay = 5; // Por defecto
 static uint8_t ack = 1; //0 if acks are disabled, otherwise retries (1 - 8)
-static bool adr = true;
+static bool adr = true; // Adaptive Data Rate habilitado.
 
 
 
@@ -145,7 +132,7 @@ DigitalIn DI_Interruption(PA_0, PullNone); // Pin 12 Este pin es el único que m
 InterruptIn DI_Panel(PA_3, PullNone); // Pin 3 Este es el que estará puenteado al PA_0 que es el que permite despertar.
 
 // DO a utilizar
-DigitalOut Led_Blue(PC_13); // Pin 13. Este será un diodo azul que indica que está en modo config
+DigitalOut Led_Blue(PC_13); // Pin 13. Este será un diodo amarillo que indica que está en modo config
 DigitalOut Led_Red(PC_9); // Pin 7. Este será un diodo rojo que indicará fallas en escritura
 DigitalOut Led_Green(PA_8); // Pin 6. Este será el Led verde que indicará que está todo ok
 
@@ -154,8 +141,6 @@ Timer timer2;
 
 /////*************Declaro las funciones a utilizar**********************////
 void error_1(class mbed::DigitalOut led);
-
-//void error_2(class mbed::DigitalOut led);
 
 void entrada_modo_config(class mbed::DigitalOut led);
 
@@ -182,23 +167,10 @@ void error_1(class mbed::DigitalOut led)
     }   
 }
 
-/*void error_2(class mbed::DigitalOut led)
-{
-    while(1)
-    {
-        //parpadeo 2: intermitente cada 1 seg
-        // indica que fallo la lectura de la configuracion o que los datos no son correctos
-        led.write(1);
-        wait(1);
-        led.write(0);
-        wait(1);
-        
-    }
-}*/
 
 void entrada_modo_config(class mbed::DigitalOut led)
 {
-    // indica que se ingreso en el modo configuracion. Se prende 5 segundos y se apaga.
+    // indica que se ingreso en el modo configuracion. Se prende 15 segundos y se apaga.
     led.write(1);
     wait(15);
     led.write(0);
@@ -272,7 +244,7 @@ float funcion_calcularFrec (int ADC_leer) //Lee 8 adc distintos. Se le indica cu
             }
             
             // Vuelvo a leer el tiempo en us y me fijo si pasó 1 segundo y todavía no llegó ni a la mitad de ciclos que
-            // tendría la mas baja frecuencia entonces corto porque o no hay señal o es una frecuencia no permitida
+            // tomo como criterio para medir entonces corto porque o no hay señal o es una frecuencia no permitida
             // y salgo del while
 
             if((timer2.read_us() > 1000000) && (contador < 21))
@@ -309,7 +281,7 @@ void func_configuracion()
         
         int indice_conf = 0; //Para ver qué quiere configurar.
         int tiempoSleep = 0; // Lo inicializo con un valor por si se entra al modo config y no se setea esto.
-        //int aux = 0; // Esta variable se utilizará para guardar en archivo
+        
         int flag_error_write=0; // Flag de error de lectura
         int cantReintentos = 0; //Variable que contiene cantidad de reintentos.
         int tiempoSuperior;
@@ -330,14 +302,10 @@ void func_configuracion()
 
         entrada_modo_config(Led_Blue); //Acá debería parpadear el led azul que te indica que estás en el modo configuración.
 
-        // Se queda esperando que el usuario ponga "ok" en el inicio.
+        // Se queda esperando que el usuario ponga "0" en el inicio.
         pc.printf("Usted se encuentra en el modo configuracion. Ingrese '0' para continuar.\n\r");
         pc.scanf("%d",&ok);
 
-        //if(ok == 0)
-        //{
-        //        pc.printf("%d_\n\r", cantidad_AI);     //Calculo que esto es solo para printear cuantas entradas AI hay. Se podría omitir o agregar mas info         
-        //}
 
         
 
@@ -459,7 +427,7 @@ void func_configuracion()
                         
                         if(dot->writeUserFile(nombre_file, &K_conf, sizeof(K_conf))<0 || flag_error_write<0) //se guarda en la memoria no volatil
                             error_1(Led_Red); //Enciende Led Rojo intermitente si falla la escritura
-                        //break;
+                        
 
                         //Agrego las siguientes lineas para printear. 
                         dot->seekUserFile(nombre_file, sizeof(int)*13, 0);
@@ -529,7 +497,7 @@ bool func_leer_config(void)
 
         }else
         {
-            //if(TIEMPO_SLEEP <= (TIEMPO_RANDOM_SUP +  (cantidad_REINTENTOS + 1)))
+            
             if(TIEMPO_SLEEP <= (TIEMPO_RANDOM_SUP *(cantidad_REINTENTOS + 1))) // Tomo el peor caso: TiempoRandomSup y pido que sea mayor a esta condición
             {
                 logInfo("ERROR en la configuracion \n\r");
@@ -554,52 +522,19 @@ bool func_leer_config(void)
         {
             // A
             case 1:
-                            //CHANNEL_PLAN CP_US915;
+                            //CHANNEL_PLAN CP_AU915;
                             plan = new lora::ChannelPlan_AU915();
                             logInfo("\n\rUsted ha seleccionado AU915\n\r");
                             break;
                     
             // B
             case 2:
-                            //CHANNEL_PLAN CP_AU915;
+                            //CHANNEL_PLAN CP_US915;
                             plan = new lora::ChannelPlan_US915();
                             logInfo("\n\rUsted ha seleccionado US915\n\r");                           
                             break;
-            /*        
-            // C
-            case 67:
-                            //CHANNEL_PLAN CP_EU868;
-                            plan = new lora::ChannelPlan_EU868();
-                            logInfo("\n\rSe selecciono EU868\n\r");
-                            break;
-                    
-            // D
-            case 68:
-                            //CHANNEL_PLAN CP_KR920;
-                            plan = new lora::ChannelPlan_KR920();
-                            logInfo("\n\rSe selecciono KR920\n\r");
-                            break;
-                    
-            // E
-            case 69:
-                            //CHANNEL_PLAN CP_AS923;
-                            plan = new lora::ChannelPlan_AS923();
-                            logInfo("\n\rSe selecciono AS923\n\r");
-                            break;
-                    
-            // F
-            case 70:
-                            //CHANNEL_PLAN CP_AS923_JAPAN;
-                            plan = new lora::ChannelPlan_AS923_Japan();
-                            logInfo("\n\rSe selecciono AS923_JAPAN\n\r");
-                            break;
-            // G
-            case 71:
-                            //CHANNEL_PLAN CP_IN865;
-                            plan = new lora::ChannelPlan_IN865();
-                            logInfo("\n\rSe selecciono IN865\n\r");
-                            break;
-            */                
+            
+                
             default: 
                             logInfo("\n\rEl valor ingresado no es valido\n\r");
                             logInfo("\n\rfrecSeleccionada= %d\n\r", frecSeleccionada);
@@ -624,7 +559,7 @@ bool func_leer_config(void)
             }
                 
         }
-        Tiempo_reintento_join_2=TIEMPO_SLEEP; //Evaluar que onda esto
+        Tiempo_reintento_join_2=TIEMPO_SLEEP; //El tiempo de reintento luego de fallar 11 paquetes.
     }
     
     return error_config;
@@ -750,7 +685,7 @@ void interruptPanel_rise(void)
             dot->setJoinDelay(join_delay);
         
             // Guardar cambios en la configuracion
-            // logInfo("Guardando configuracion");
+            
             if (!dot->saveConfig()) {
                 //logError("No se pudo guardar la configuracion");
             }
@@ -760,15 +695,14 @@ void interruptPanel_rise(void)
 
         } else {
             // restaurar la sesión guardada si el Dot se despertó del modo deepsleep
-            // útil para usar con deepsleep porque la información de la sesión se pierde cuando el Dot entra en deepsleep
-            //logInfo("restaurar sesion de red desde NVM");
+            
             dot->restoreNetworkSession();
         }
             
         
         int j=0;
         int k=0;
-        //int flag_error_envio=0; //Preguntar luego qué onda esta variable
+        
         int num_intentos=0;
         int cantidad_envios= 1 + cantidad_REINTENTOS;
         int caudal[cantidad_AI];
@@ -820,8 +754,7 @@ void interruptPanel_rise(void)
 
                 }
         
-                //if(flag_error_envio==0)// Si no hay error de envío, realizo la medicion pues armo paquete nuevo
-                //{
+                
                     tx_data1.clear(); //Limpio el paquete 1 de datos para armar nuevo
                     tx_data2.clear(); //Limpio el paquete 2 de datos para armar nuevo
                     tx_data3.clear(); //Limpio el paquete 3 de datos para armar uno nuevo
@@ -867,7 +800,7 @@ void interruptPanel_rise(void)
                             {
                                 // Caudal en m3/h
                                 caudal[k]=int( ( frec_ch[k] / K[k] ) * 3600/1000 *10); //El *10 es para tomar 1 decimal de resolución. Es un entero pero la frecuencia es float
-                                // si K>6 se podria usar dos decimales en lugar de uno.
+                                
 
                                 if(k<4)
                                 {
@@ -881,14 +814,13 @@ void interruptPanel_rise(void)
                                     tx_data2.push_back(caudal[k] & 0xFF);
                                 }
                                 
-                                //tx_data1.push_back((caudal[k] >> 8) & 0xFF);
-                                //tx_data1.push_back(caudal[k] & 0xFF);
+
                                                                 
                                 logInfo("Caudal AI_%d = %d en m3/h\n\r\n",(k+1), caudal[k]);
                             
                             }else 
                             {
-                                frec_ch_int[k]= int(frec_ch[k] * 10); //Acá guardas la frecuencia pero en su valor entero, es decir, lo multiplicas por 10 y casteas a entero.
+                                frec_ch_int[k]= int(frec_ch[k] * 10); //Acá guarda la frecuencia pero en su valor entero, es decir, se multiplica por 10 y castea a entero.
 
 
                                 if(k<4)
@@ -900,8 +832,7 @@ void interruptPanel_rise(void)
                                     tx_data2.push_back((frec_ch_int[k] >> 8) & 0xFF);
                                     tx_data2.push_back(frec_ch_int[k] & 0xFF);
                                 }
-                               //tx_data1.push_back((frec_ch_int[k] >> 8) & 0xFF);
-                               //tx_data1.push_back(frec_ch_int[k] & 0xFF);
+
                                 
                                 logInfo("Frecuencia entera con un decimal de AI_%d = %d \n\r\n",(k+1), frec_ch_int[k]);
                                 
@@ -919,25 +850,21 @@ void interruptPanel_rise(void)
                                 tx_data2.push_back(0xFF);
                                 tx_data2.push_back(0xFF);
                             }
-                            //tx_data1.push_back(0xFF);
-                            //tx_data1.push_back(0xFF);
+
                             
                         }                        
                         
                     } 
-                    //timer1.stop();
-                    //int tiempo= timer1.read_us();
-                    //pc.printf("tiempo [us]=%d \n\r\n",tiempo);              
-                //}
+
                 
                 //Hasta acá armé los paquetes nada mas, no los envié.
 
-                num_intentos=0; // cuenta la cantidad de intentos de comunicación que se intentaron desde que falló
+                num_intentos=0; // Cuenta la cantidad de intentos de comunicación que se intentaron desde que falló
                 SumaTiempoRandom = 0; //Suma el tiempo random total para luego restarlo a cuando debe ir a sleep
                 
                 //Transmision del primer msj      
                              
-                //while(((cantidad_envios - flag_error_envio - num_intentos) != 0) && (send_data(tx_data1)!=0)  ) //si no recibio el ACK en ninguna de las dos ventanas y si no se realizaron todos los intentos
+                
                 while(((cantidad_envios - num_intentos) != 0) && ( (send_data(tx_data1)!=0) || (send_data(tx_data2)!=0)) || (send_data(tx_data3)!=0) ) //Si no recibio el ACK en alguna de las dos ventanas (distinto de cero) y si no se realizaron todos los intentos
                 {
                     num_intentos++; //Va por el próximo intento pues falló alguna condición, por ej, no se recibió ACK de algun send_data   
@@ -965,71 +892,12 @@ void interruptPanel_rise(void)
         
                 
 
-                // Si entra en modo deepsleep, guarde la sesión para que no se necesite unirse nuevamente después de despertar
-                // no es necesario si entra en modo sleep ya que se retiene la RAM, sirve para XDot
-                //if (sleepMode) {
-                    //logInfo("Guardar sesion de red en NVM");
-                //    dot->saveNetworkSession();
-                //}
-                
                 
                 // El tiempo de sleep depende de las condiciones
                 // esto se hace para intentar mantener constante el tiempo entre muestras, 
                 // si ocurre una falla la muestra actual sufrira un desfasaje 
                 // pero la proxima muestra no se encuentra afectada y continua con el tiempo original.
-                /*if(cantidad_REINTENTOS==0) //Si no quiero que haya reintentos entonces que se despierte cada cierto TIEMPO_SLEEP
-                {
 
-                    //Se despierta solo con rtc       
-                    sleep_wake_rtc_only(sleepMode,TIEMPO_SLEEP); //Se despierta para tomar muestras y enviarlas cada cierto periodo TIEMPO_SLEEP
-
-
-                }else// cantidad_REINTENTOS es 1 o 2
-                {
-                    // Acá ya probó en numero de intentos correspondientes ya que salió del while anterior. Ahora se va a dormir un tiempo random para luego despertarse e intentar nuevamente
-                    //una cantidad fija dada por cantidad_REINTENTOS
-                    if(flag_error_envio==0 && (cantidad_envios - flag_error_envio - num_intentos) == 0) // Acá se generan los tiempos Random en el otro código
-                    {*/
-                        /*//T random
-                        // initialize random seed: 
-                        srand (time(NULL));
-                        
-                        // Defino el intervalo del valor random y obtengo un valor
-                        TiempoRandom = rand() % (TIEMPO_RANDOM_SUP - TIEMPO_RANDOM_INF) + TIEMPO_RANDOM_INF;
-                        //logInfo("tiempo_rand = %d\n\r\n", tiempo_rand);
-                        logInfo("Tiempo random asignado  = %d\n\r\n",TiempoRandom);
-                        // Tiempo random total que se consume
-                        SumaTiempoRandom = SumaTiempoRandom + TiempoRandom;
-                        logInfo("Tiempo random total  = %d\n\r\n",SumaTiempoRandom);
-
-
-                        //Se despierta solo con rtc luego de un cierto tiempo random pues ya fallaron los intentos fijos    
-                        sleep_wake_rtc_only(sleepMode,TiempoRandom);
-                        */
-                        /*flag_error_envio = 1; // cambio el valor del flag pues sí hubo error en el envío del paquete, sólo que se contabiliza recién ahora, luego de calcular cuando volverá a enviar
-                        logInfo("flag_error_envio = %d\n\r\n",flag_error_envio);
-                        
-                    }else
-                    {
-                        //Acá entra cuando ya intentó, luego de dormir un tiempo random, la cantidad de veces seteada y todas fallaron, sólo resta irse a dormir.
-                        if((cantidad_envios - flag_error_envio - num_intentos) == 0) // fallo en todos los envios (primera y segunda tanda) 
-                        {
-                            num_intentos=num_intentos-1;// resto para que de bien el t sleep. Cuenta los intervalos de tiempo (ver mi hoja)
-                        }
-                        // Sleep por Tsleep - T suma -T reintento * num reintentos      
-                        //sleep_wake_rtc_only(sleepMode,TIEMPO_SLEEP - SumaTiempoRandom -(num_intentos)); // Acá es donde me voy a dormir el tiempo que queda hasta TIEMPO_SLEEP que debo despertar
-
-                        // T suma=0
-                        //SumaTiempoRandom=0;
-                        //logInfo("Tiempo random total  = %d\n\r\n",SumaTiempoRandom);
-
-                        flag_error_envio=0; // cambio el valor del flag para que pueda volver a enviar paquetes
-                        logInfo("flag_error_envio = %d\n\r\n",flag_error_envio);
-                    }
-
-                    
-                }*/               
-                //sleep_wake_rtc_only(sleepMode,TIEMPO_SLEEP - SumaTiempoRandom);
                 sleep_wake_rtc_or_interrupt(sleepMode, TIEMPO_SLEEP - SumaTiempoRandom); //Esta linea va cuando pueda probar en placa
         }
  }
